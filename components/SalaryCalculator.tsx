@@ -76,6 +76,18 @@ export default function SalaryCalculator() {
 	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("0");
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 	const [focusedInput, setFocusedInput] = useState<string | null>(null);
+	
+	// Internal exact values for precise calculations
+	const [_exactValues, setExactValues] = useState({
+		hourlyGross: 0,
+		monthlyGross: 0,
+		annualGross: 0,
+		hourlyNet: 0,
+		monthlyNet: 0,
+		annualNet: 0,
+		monthlyNetAfterTax: 0,
+		annualNetAfterTax: 0,
+	});
 
 	const getDeductionRate = useCallback((status: Status): number => {
 		return deductionRates[status];
@@ -136,16 +148,29 @@ export default function SalaryCalculator() {
 				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
 			}
 
-			const hourlyGrossValue = roundToCents(monthlyGrossValue / 151.67);
-			const annualGrossValue = roundToCents(monthlyGrossValue * bonusMonths);
+			const hourlyGrossValue = monthlyGrossValue / 151.67;
+			const annualGrossValue = monthlyGrossValue * bonusMonths;
 
-			const monthlyNetValue = roundToCents(calculateFromGrossToNet(monthlyGrossValue));
-			const hourlyNetValue = roundToCents(monthlyNetValue / 151.67);
-			const annualNetValue = roundToCents(monthlyNetValue * bonusMonths);
+			const monthlyNetValue = calculateFromGrossToNet(monthlyGrossValue);
+			const hourlyNetValue = monthlyNetValue / 151.67;
+			const annualNetValue = monthlyNetValue * bonusMonths;
 
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
 
+			// Store exact values internally
+			setExactValues({
+				hourlyGross: hourlyGrossValue,
+				monthlyGross: monthlyGrossValue,
+				annualGross: annualGrossValue,
+				hourlyNet: hourlyNetValue,
+				monthlyNet: monthlyNetValue,
+				annualNet: annualNetValue,
+				monthlyNetAfterTax: monthlyAfterTax,
+				annualNetAfterTax: annualAfterTax,
+			});
+
+			// Update display values with proper rounding
 			if (focusedInput !== "hourlyGross") {
 				setHourlyGross(formatHourlyRate(hourlyGrossValue));
 			}
@@ -240,6 +265,16 @@ export default function SalaryCalculator() {
 		setMonthlyNetAfterTax("0");
 		setAnnualNetAfterTax("0");
 		setFocusedInput(null);
+		setExactValues({
+			hourlyGross: 0,
+			monthlyGross: 0,
+			annualGross: 0,
+			hourlyNet: 0,
+			monthlyNet: 0,
+			annualNet: 0,
+			monthlyNetAfterTax: 0,
+			annualNetAfterTax: 0,
+		});
 	};
 
 	return (
