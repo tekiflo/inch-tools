@@ -143,28 +143,24 @@ export default function SalaryCalculator() {
 		],
 	);
 
-	// Recalculate when work time percentage changes
 	useEffect(() => {
 		if (monthlyGross && parseFloat(monthlyGross) > 0) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
-	// Recalculate when status changes
 	useEffect(() => {
 		if (monthlyGross && parseFloat(monthlyGross) > 0) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
-	// Recalculate when bonus months change
 	useEffect(() => {
 		if (monthlyGross && parseFloat(monthlyGross) > 0) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
-	// Recalculate after-tax values when source deduction changes
 	useEffect(() => {
 		if (monthlyNet && parseFloat(monthlyNet) > 0) {
 			const monthlyAfterTax = calculateAfterTax(parseFloat(monthlyNet));
@@ -539,9 +535,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 12,
 	},
-	statusOptionSelected: {
-		// Selected styling handled by radio
-	},
+	statusOptionSelected: {},
 	radio: {
 		width: 20,
 		height: 20,
@@ -600,9 +594,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 		width: "30%",
 	},
-	bonusOptionSelected: {
-		// Selected styling handled by radio
-	},
+	bonusOptionSelected: {},
 	bonusLabel: {
 		color: "#2c3e50",
 		fontSize: 12,
