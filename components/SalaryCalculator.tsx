@@ -1,5 +1,5 @@
 import Slider from "@react-native-community/slider";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	ScrollView,
 	StyleSheet,
@@ -142,6 +142,37 @@ export default function SalaryCalculator() {
 			calculateAfterTax,
 		],
 	);
+
+	// Recalculate when work time percentage changes
+	useEffect(() => {
+		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+			updateAllFields("monthlyGross", monthlyGross);
+		}
+	}, [updateAllFields, monthlyGross]);
+
+	// Recalculate when status changes
+	useEffect(() => {
+		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+			updateAllFields("monthlyGross", monthlyGross);
+		}
+	}, [updateAllFields, monthlyGross]);
+
+	// Recalculate when bonus months change
+	useEffect(() => {
+		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+			updateAllFields("monthlyGross", monthlyGross);
+		}
+	}, [updateAllFields, monthlyGross]);
+
+	// Recalculate after-tax values when source deduction changes
+	useEffect(() => {
+		if (monthlyNet && parseFloat(monthlyNet) > 0) {
+			const monthlyAfterTax = calculateAfterTax(parseFloat(monthlyNet));
+			const annualAfterTax = calculateAfterTax(parseFloat(annualNet));
+			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
+			setAnnualNetAfterTax(annualAfterTax.toFixed(0));
+		}
+	}, [calculateAfterTax, monthlyNet, annualNet]);
 
 	const statusOptions: Array<{ label: string; value: Status }> = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
@@ -332,9 +363,6 @@ export default function SalaryCalculator() {
 						value={workTimePercentage}
 						onValueChange={(value) => {
 							setWorkTimePercentage(value);
-							if (monthlyGross) {
-								updateAllFields("monthlyGross", monthlyGross);
-							}
 						}}
 						step={10}
 						minimumTrackTintColor="#e74c3c"
