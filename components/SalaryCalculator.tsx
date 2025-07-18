@@ -62,6 +62,7 @@ export default function SalaryCalculator() {
 	const [sourceDeduction, setSourceDeduction] = useState(0);
 	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("0");
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
+	const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
 	const getDeductionRate = useCallback((status: Status): number => {
 		return deductionRates[status];
@@ -132,12 +133,24 @@ export default function SalaryCalculator() {
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
 
-			setHourlyGross(formatHourlyRate(hourlyGrossValue));
-			setMonthlyGross(monthlyGrossValue.toFixed(0));
-			setAnnualGross(annualGrossValue.toFixed(0));
-			setHourlyNet(formatHourlyRate(hourlyNetValue));
-			setMonthlyNet(monthlyNetValue.toFixed(0));
-			setAnnualNet(annualNetValue.toFixed(0));
+			if (focusedInput !== "hourlyGross") {
+				setHourlyGross(formatHourlyRate(hourlyGrossValue));
+			}
+			if (focusedInput !== "monthlyGross") {
+				setMonthlyGross(monthlyGrossValue.toFixed(0));
+			}
+			if (focusedInput !== "annualGross") {
+				setAnnualGross(annualGrossValue.toFixed(0));
+			}
+			if (focusedInput !== "hourlyNet") {
+				setHourlyNet(formatHourlyRate(hourlyNetValue));
+			}
+			if (focusedInput !== "monthlyNet") {
+				setMonthlyNet(monthlyNetValue.toFixed(0));
+			}
+			if (focusedInput !== "annualNet") {
+				setAnnualNet(annualNetValue.toFixed(0));
+			}
 			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
 			setAnnualNetAfterTax(annualAfterTax.toFixed(0));
 		},
@@ -146,6 +159,7 @@ export default function SalaryCalculator() {
 			calculateFromGrossToNet,
 			calculateFromNetToGross,
 			calculateAfterTax,
+			focusedInput,
 		],
 	);
 
@@ -188,6 +202,21 @@ export default function SalaryCalculator() {
 
 	const bonusMonthOptions = [12, 13, 14, 15, 16];
 
+	const handleInputFocus = (fieldName: string) => {
+		setFocusedInput(fieldName);
+	};
+
+	const handleInputBlur = () => {
+		setFocusedInput(null);
+	};
+
+	const handleHourlyBlur = (value: string, setter: (value: string) => void) => {
+		if (value && parseFloat(value) > 0) {
+			setter(formatHourlyRate(parseFloat(value)));
+		}
+		setFocusedInput(null);
+	};
+
 	const clearFields = () => {
 		setHourlyGross("");
 		setMonthlyGross("");
@@ -197,6 +226,7 @@ export default function SalaryCalculator() {
 		setAnnualNet("");
 		setMonthlyNetAfterTax("0");
 		setAnnualNetAfterTax("0");
+		setFocusedInput(null);
 	};
 
 	return (
@@ -224,6 +254,8 @@ export default function SalaryCalculator() {
 								updateAllFields("hourlyGross", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("hourlyGross")}
+						onBlur={() => handleHourlyBlur(hourlyGross, setHourlyGross)}
 						keyboardType="numeric"
 						placeholder="ex : 9.88"
 						placeholderTextColor="#e74c3c"
@@ -240,6 +272,8 @@ export default function SalaryCalculator() {
 								updateAllFields("hourlyNet", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("hourlyNet")}
+						onBlur={() => handleHourlyBlur(hourlyNet, setHourlyNet)}
 						keyboardType="numeric"
 						placeholder="Horaire"
 						placeholderTextColor="#e74c3c"
@@ -262,6 +296,8 @@ export default function SalaryCalculator() {
 								updateAllFields("monthlyGross", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("monthlyGross")}
+						onBlur={handleInputBlur}
 						keyboardType="numeric"
 						placeholder="ex : 1498"
 						placeholderTextColor="#e74c3c"
@@ -278,6 +314,8 @@ export default function SalaryCalculator() {
 								updateAllFields("monthlyNet", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("monthlyNet")}
+						onBlur={handleInputBlur}
 						keyboardType="numeric"
 						placeholder="Mensuel"
 						placeholderTextColor="#e74c3c"
@@ -297,6 +335,8 @@ export default function SalaryCalculator() {
 								updateAllFields("annualGross", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("annualGross")}
+						onBlur={handleInputBlur}
 						keyboardType="numeric"
 						placeholder="ex : 17976"
 						placeholderTextColor="#e74c3c"
@@ -313,6 +353,8 @@ export default function SalaryCalculator() {
 								updateAllFields("annualNet", value);
 							}
 						}}
+						onFocus={() => handleInputFocus("annualNet")}
+						onBlur={handleInputBlur}
 						keyboardType="numeric"
 						placeholder="Annuel"
 						placeholderTextColor="#e74c3c"
