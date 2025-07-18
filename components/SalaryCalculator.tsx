@@ -1,5 +1,5 @@
 import Slider from "@react-native-community/slider";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	ScrollView,
 	StyleSheet,
@@ -23,6 +23,99 @@ export default function SalaryCalculator() {
 	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("13");
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("159");
 
+	const getDeductionRate = useCallback((status: string): number => {
+		const rates: Record<string, number> = {
+			"non-cadre": 0.22,
+			cadre: 0.25,
+			"fonction-publique": 0.17,
+			"profession-liberale": 0.35,
+			"portage-salarial": 0.47,
+		};
+		return rates[status] || 0.22;
+	}, []);
+
+	const calculateFromGrossToNet = useCallback(
+		(grossAmount: number): number => {
+			const deductionRate = getDeductionRate(status);
+			const workTimeFactor = workTimePercentage / 100;
+			return grossAmount * (1 - deductionRate) * workTimeFactor;
+		},
+		[getDeductionRate, status, workTimePercentage],
+	);
+
+	const calculateFromNetToGross = useCallback(
+		(netAmount: number): number => {
+			const deductionRate = getDeductionRate(status);
+			const workTimeFactor = workTimePercentage / 100;
+			return netAmount / ((1 - deductionRate) * workTimeFactor);
+		},
+		[getDeductionRate, status, workTimePercentage],
+	);
+
+	const calculateAfterTax = useCallback(
+		(netAmount: number): number => {
+			return netAmount * (1 - sourceDeduction / 100);
+		},
+		[sourceDeduction],
+	);
+
+	const updateAllFields = useCallback(
+		(
+			source:
+				| "hourlyGross"
+				| "monthlyGross"
+				| "annualGross"
+				| "hourlyNet"
+				| "monthlyNet"
+				| "annualNet",
+			value: string,
+		) => {
+			const numValue = parseFloat(value) || 0;
+			let monthlyGrossValue = 0;
+
+			if (source === "hourlyGross") {
+				monthlyGrossValue = numValue * 151.67;
+			} else if (source === "monthlyGross") {
+				monthlyGrossValue = numValue;
+			} else if (source === "annualGross") {
+				monthlyGrossValue = numValue / bonusMonths;
+			} else if (source === "hourlyNet") {
+				const monthlyNetValue = numValue * 151.67;
+				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
+			} else if (source === "monthlyNet") {
+				monthlyGrossValue = calculateFromNetToGross(numValue);
+			} else if (source === "annualNet") {
+				const monthlyNetValue = numValue / bonusMonths;
+				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
+			}
+
+			const hourlyGrossValue = monthlyGrossValue / 151.67;
+			const annualGrossValue = monthlyGrossValue * bonusMonths;
+
+			const monthlyNetValue = calculateFromGrossToNet(monthlyGrossValue);
+			const hourlyNetValue = monthlyNetValue / 151.67;
+			const annualNetValue = monthlyNetValue * bonusMonths;
+
+			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
+			const annualAfterTax = calculateAfterTax(annualNetValue);
+
+			setHourlyGross(hourlyGrossValue.toFixed(2));
+			setMonthlyGross(monthlyGrossValue.toFixed(0));
+			setAnnualGross(annualGrossValue.toFixed(0));
+			setHourlyNet(hourlyNetValue.toFixed(2));
+			setMonthlyNet(monthlyNetValue.toFixed(0));
+			setAnnualNet(annualNetValue.toFixed(0));
+			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
+			setAnnualNetAfterTax(annualAfterTax.toFixed(0));
+		},
+		[
+			bonusMonths,
+			calculateFromGrossToNet,
+			calculateFromNetToGross,
+			calculateAfterTax,
+		],
+	);
+
 	const statusOptions = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
 		{ label: "Salarié cadre", value: "cadre" },
@@ -33,7 +126,7 @@ export default function SalaryCalculator() {
 
 	const statusTooltips: Record<string, string> = {
 		"non-cadre": "Non-cadre -22%",
-		"cadre": "Cadre -25%",
+		cadre: "Cadre -25%",
 		"fonction-publique": "Public -17%",
 		"profession-liberale": "Indé -35%",
 		"portage-salarial": "Port -47%",
@@ -69,7 +162,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={hourlyGross}
-						onChangeText={setHourlyGross}
+						onChangeText={(value) => {
+							setHourlyGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("hourlyGross", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -78,7 +176,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={hourlyNet}
-						onChangeText={setHourlyNet}
+						onChangeText={(value) => {
+							setHourlyNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("hourlyNet", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -93,7 +196,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={monthlyGross}
-						onChangeText={setMonthlyGross}
+						onChangeText={(value) => {
+							setMonthlyGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("monthlyGross", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -102,7 +210,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={monthlyNet}
-						onChangeText={setMonthlyNet}
+						onChangeText={(value) => {
+							setMonthlyNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("monthlyNet", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -114,7 +227,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={annualGross}
-						onChangeText={setAnnualGross}
+						onChangeText={(value) => {
+							setAnnualGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("annualGross", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -123,7 +241,12 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={annualNet}
-						onChangeText={setAnnualNet}
+						onChangeText={(value) => {
+							setAnnualNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("annualNet", value);
+							}
+						}}
 						keyboardType="numeric"
 					/>
 				</View>
@@ -139,7 +262,9 @@ export default function SalaryCalculator() {
 								styles.statusOption,
 								status === option.value && styles.statusOptionSelected,
 							]}
-							onPress={() => setStatus(option.value)}
+							onPress={() => {
+								setStatus(option.value);
+							}}
 						>
 							<View
 								style={[
@@ -172,7 +297,9 @@ export default function SalaryCalculator() {
 						minimumValue={0}
 						maximumValue={100}
 						value={workTimePercentage}
-						onValueChange={setWorkTimePercentage}
+						onValueChange={(value) => {
+							setWorkTimePercentage(value);
+						}}
 						step={1}
 						minimumTrackTintColor="#e74c3c"
 						maximumTrackTintColor="#e0e0e0"
@@ -193,7 +320,9 @@ export default function SalaryCalculator() {
 								styles.bonusOption,
 								bonusMonths === months && styles.bonusOptionSelected,
 							]}
-							onPress={() => setBonusMonths(months)}
+							onPress={() => {
+								setBonusMonths(months);
+							}}
 						>
 							<View
 								style={[
@@ -227,7 +356,9 @@ export default function SalaryCalculator() {
 						minimumValue={0}
 						maximumValue={100}
 						value={sourceDeduction}
-						onValueChange={setSourceDeduction}
+						onValueChange={(value) => {
+							setSourceDeduction(value);
+						}}
 						step={0.1}
 						minimumTrackTintColor="#e74c3c"
 						maximumTrackTintColor="#e0e0e0"
@@ -318,6 +449,7 @@ const styles = StyleSheet.create({
 	},
 	badgeText: {
 		backgroundColor: "#c0392b",
+		color: "white",
 		paddingHorizontal: 6,
 		paddingVertical: 2,
 		borderRadius: 3,
