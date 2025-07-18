@@ -65,7 +65,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.inputRow}>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>Horaire brut</Text>
+					<Text style={styles.labelText}>Horaire brut</Text>
 					<TextInput
 						style={styles.input}
 						value={hourlyGross}
@@ -74,7 +74,7 @@ export default function SalaryCalculator() {
 					/>
 				</View>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>Horaire net</Text>
+					<Text style={styles.labelText}>Horaire net</Text>
 					<TextInput
 						style={styles.input}
 						value={hourlyNet}
@@ -86,10 +86,10 @@ export default function SalaryCalculator() {
 
 			<View style={styles.inputRow}>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>
-						Mensuel brut
-						<Text style={styles.badgeText}> {statusTooltips[status]}</Text>
-					</Text>
+					<View style={styles.label}>
+						<Text style={styles.labelText}>Mensuel brut</Text>
+						<Text style={styles.badgeText}>{statusTooltips[status]}</Text>
+					</View>
 					<TextInput
 						style={styles.input}
 						value={monthlyGross}
@@ -98,7 +98,7 @@ export default function SalaryCalculator() {
 					/>
 				</View>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>Mensuel net</Text>
+					<Text style={styles.labelText}>Mensuel net</Text>
 					<TextInput
 						style={styles.input}
 						value={monthlyNet}
@@ -110,7 +110,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.inputRow}>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>Annuel brut</Text>
+					<Text style={styles.labelText}>Annuel brut</Text>
 					<TextInput
 						style={styles.input}
 						value={annualGross}
@@ -119,7 +119,7 @@ export default function SalaryCalculator() {
 					/>
 				</View>
 				<View style={styles.inputGroup}>
-					<Text style={styles.label}>Annuel net</Text>
+					<Text style={styles.labelText}>Annuel net</Text>
 					<TextInput
 						style={styles.input}
 						value={annualNet}
@@ -307,9 +307,14 @@ const styles = StyleSheet.create({
 		flex: 0.48,
 	},
 	label: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		alignItems: "center",
+		marginBottom: 5,
+	},
+	labelText: {
 		color: "white",
 		fontSize: 12,
-		marginBottom: 5,
 	},
 	badgeText: {
 		backgroundColor: "#c0392b",
