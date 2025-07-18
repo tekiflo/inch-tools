@@ -676,6 +676,9 @@ const styles = StyleSheet.create({
 	mainContentWide: {
 		flexDirection: "row",
 		alignItems: "flex-start",
+		justifyContent: "center",
+		maxWidth: 1200,
+		width: "100%",
 	},
 	leftColumn: {
 		width: "100%",
