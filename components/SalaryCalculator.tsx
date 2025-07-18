@@ -18,28 +18,25 @@ const StatusEnum = z.enum([
 	"portage-salarial",
 ]);
 
-const hourlyValueSchema = z.number().positive().finite();
-const naturalNumberSchema = z.number().int().positive().finite();
-const sourceDeductionSchema = z.number().min(0).max(100).finite();
-
-const validateHourlyInput = (value: string): string => {
-	const num = parseFloat(value);
-	if (isNaN(num) || num < 0) return "";
-	return num.toFixed(2);
-};
-
-const validateNaturalInput = (value: string): string => {
-	const num = parseInt(value);
-	if (isNaN(num) || num < 0) return "";
-	return num.toString();
-};
-
-const validateSourceDeduction = (value: number): string => {
-	if (isNaN(value) || value < 0 || value > 100) return "0.0";
-	return value.toFixed(1);
-};
-
 type Status = z.infer<typeof StatusEnum>;
+
+const deductionRates: Record<Status, number> = {
+	"non-cadre": 0.22,
+	cadre: 0.25,
+	"fonction-publique": 0.17,
+	"profession-liberale": 0.35,
+	"portage-salarial": 0.47,
+};
+
+const generateStatusTooltips = (rates: Record<Status, number>): Record<Status, string> => {
+	return {
+		"non-cadre": `Non-cadre -${Math.round(rates["non-cadre"] * 100)}%`,
+		cadre: `Cadre -${Math.round(rates.cadre * 100)}%`,
+		"fonction-publique": `Public -${Math.round(rates["fonction-publique"] * 100)}%`,
+		"profession-liberale": `Indé -${Math.round(rates["profession-liberale"] * 100)}%`,
+		"portage-salarial": `Port -${Math.round(rates["portage-salarial"] * 100)}%`,
+	};
+};
 
 export default function SalaryCalculator() {
 	const [hourlyGross, setHourlyGross] = useState("");
@@ -56,14 +53,7 @@ export default function SalaryCalculator() {
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 
 	const getDeductionRate = useCallback((status: Status): number => {
-		const rates: Record<Status, number> = {
-			"non-cadre": 0.22,
-			cadre: 0.25,
-			"fonction-publique": 0.17,
-			"profession-liberale": 0.35,
-			"portage-salarial": 0.47,
-		};
-		return rates[status];
+		return deductionRates[status];
 	}, []);
 
 	const calculateFromGrossToNet = useCallback(
@@ -156,13 +146,7 @@ export default function SalaryCalculator() {
 		{ label: "Portage salarial", value: "portage-salarial" },
 	];
 
-	const statusTooltips: Record<Status, string> = {
-		"non-cadre": "Non-cadre -22%",
-		cadre: "Cadre -25%",
-		"fonction-publique": "Public -17%",
-		"profession-liberale": "Indé -35%",
-		"portage-salarial": "Port -47%",
-	};
+	const statusTooltips = generateStatusTooltips(deductionRates);
 
 	const bonusMonthOptions = [12, 13, 14, 15, 16];
 
