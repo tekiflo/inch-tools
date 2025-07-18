@@ -327,13 +327,16 @@ export default function SalaryCalculator() {
 				<View style={styles.sliderContainer}>
 					<Slider
 						style={styles.slider}
-						minimumValue={0}
+						minimumValue={10}
 						maximumValue={100}
 						value={workTimePercentage}
 						onValueChange={(value) => {
 							setWorkTimePercentage(value);
+							if (monthlyGross) {
+								updateAllFields("monthlyGross", monthlyGross);
+							}
 						}}
-						step={1}
+						step={10}
 						minimumTrackTintColor="#e74c3c"
 						maximumTrackTintColor="#e0e0e0"
 						thumbTintColor="#e74c3c"
