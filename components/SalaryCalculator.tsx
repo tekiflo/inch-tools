@@ -8,30 +8,62 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { z } from "zod";
+
+const StatusEnum = z.enum([
+	"non-cadre",
+	"cadre", 
+	"fonction-publique",
+	"profession-liberale",
+	"portage-salarial"
+]);
+
+const hourlyValueSchema = z.number().positive().finite();
+const naturalNumberSchema = z.number().int().positive().finite();
+const sourceDeductionSchema = z.number().min(0).max(100).finite();
+
+const validateHourlyInput = (value: string): string => {
+	const num = parseFloat(value);
+	if (isNaN(num) || num < 0) return "";
+	return num.toFixed(2);
+};
+
+const validateNaturalInput = (value: string): string => {
+	const num = parseInt(value);
+	if (isNaN(num) || num < 0) return "";
+	return num.toString();
+};
+
+const validateSourceDeduction = (value: number): string => {
+	if (isNaN(value) || value < 0 || value > 100) return "0.0";
+	return value.toFixed(1);
+};
+
+type Status = z.infer<typeof StatusEnum>;
 
 export default function SalaryCalculator() {
-	const [hourlyGross, setHourlyGross] = useState("0.11");
-	const [monthlyGross, setMonthlyGross] = useState("17");
-	const [annualGross, setAnnualGross] = useState("200");
-	const [hourlyNet, setHourlyNet] = useState("0.09");
-	const [monthlyNet, setMonthlyNet] = useState("13");
-	const [annualNet, setAnnualNet] = useState("156");
-	const [status, setStatus] = useState("non-cadre");
+	const [hourlyGross, setHourlyGross] = useState("");
+	const [monthlyGross, setMonthlyGross] = useState("");
+	const [annualGross, setAnnualGross] = useState("");
+	const [hourlyNet, setHourlyNet] = useState("0");
+	const [monthlyNet, setMonthlyNet] = useState("0");
+	const [annualNet, setAnnualNet] = useState("0");
+	const [status, setStatus] = useState<Status>("non-cadre");
 	const [workTimePercentage, setWorkTimePercentage] = useState(100);
 	const [bonusMonths, setBonusMonths] = useState(12);
 	const [sourceDeduction, setSourceDeduction] = useState(0);
-	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("13");
-	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("159");
+	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("0");
+	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 
-	const getDeductionRate = useCallback((status: string): number => {
-		const rates: Record<string, number> = {
+	const getDeductionRate = useCallback((status: Status): number => {
+		const rates: Record<Status, number> = {
 			"non-cadre": 0.22,
 			cadre: 0.25,
 			"fonction-publique": 0.17,
 			"profession-liberale": 0.35,
 			"portage-salarial": 0.47,
 		};
-		return rates[status] || 0.22;
+		return rates[status];
 	}, []);
 
 	const calculateFromGrossToNet = useCallback(
@@ -116,7 +148,7 @@ export default function SalaryCalculator() {
 		],
 	);
 
-	const statusOptions = [
+	const statusOptions: Array<{ label: string; value: Status }> = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
 		{ label: "Salarié cadre", value: "cadre" },
 		{ label: "Fonction publique", value: "fonction-publique" },
@@ -124,7 +156,7 @@ export default function SalaryCalculator() {
 		{ label: "Portage salarial", value: "portage-salarial" },
 	];
 
-	const statusTooltips: Record<string, string> = {
+	const statusTooltips: Record<Status, string> = {
 		"non-cadre": "Non-cadre -22%",
 		cadre: "Cadre -25%",
 		"fonction-publique": "Public -17%",
@@ -169,6 +201,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="ex : 9.88"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 				<View style={styles.inputGroup}>
@@ -183,6 +217,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="Horaire"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 			</View>
@@ -203,6 +239,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="ex : 1498"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 				<View style={styles.inputGroup}>
@@ -217,6 +255,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="Mensuel"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 			</View>
@@ -234,6 +274,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="ex : 17976"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 				<View style={styles.inputGroup}>
@@ -248,6 +290,8 @@ export default function SalaryCalculator() {
 							}
 						}}
 						keyboardType="numeric"
+						placeholder="Annuel"
+						placeholderTextColor="#e74c3c"
 					/>
 				</View>
 			</View>
