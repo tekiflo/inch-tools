@@ -12,10 +12,10 @@ import { z } from "zod";
 
 const StatusEnum = z.enum([
 	"non-cadre",
-	"cadre", 
+	"cadre",
 	"fonction-publique",
 	"profession-liberale",
-	"portage-salarial"
+	"portage-salarial",
 ]);
 
 const hourlyValueSchema = z.number().positive().finite();
@@ -45,9 +45,9 @@ export default function SalaryCalculator() {
 	const [hourlyGross, setHourlyGross] = useState("");
 	const [monthlyGross, setMonthlyGross] = useState("");
 	const [annualGross, setAnnualGross] = useState("");
-	const [hourlyNet, setHourlyNet] = useState("0");
-	const [monthlyNet, setMonthlyNet] = useState("0");
-	const [annualNet, setAnnualNet] = useState("0");
+	const [hourlyNet, setHourlyNet] = useState("");
+	const [monthlyNet, setMonthlyNet] = useState("");
+	const [annualNet, setAnnualNet] = useState("");
 	const [status, setStatus] = useState<Status>("non-cadre");
 	const [workTimePercentage, setWorkTimePercentage] = useState(100);
 	const [bonusMonths, setBonusMonths] = useState(12);
@@ -505,7 +505,6 @@ const styles = StyleSheet.create({
 		padding: 12,
 		fontSize: 16,
 		color: "#e74c3c",
-		fontWeight: "bold",
 	},
 	statusSection: {
 		marginVertical: 20,
@@ -622,7 +621,6 @@ const styles = StyleSheet.create({
 		padding: 12,
 		fontSize: 16,
 		color: "#e74c3c",
-		fontWeight: "bold",
 	},
 	clearButton: {
 		backgroundColor: "#c0392b",
