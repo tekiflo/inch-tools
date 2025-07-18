@@ -28,7 +28,9 @@ const deductionRates: Record<Status, number> = {
 	"portage-salarial": 0.47,
 };
 
-const generateStatusTooltips = (rates: Record<Status, number>): Record<Status, string> => {
+const generateStatusTooltips = (
+	rates: Record<Status, number>,
+): Record<Status, string> => {
 	return {
 		"non-cadre": `Non-cadre -${Math.round(rates["non-cadre"] * 100)}%`,
 		cadre: `Cadre -${Math.round(rates.cadre * 100)}%`,
@@ -189,8 +191,8 @@ export default function SalaryCalculator() {
 		setHourlyNet("");
 		setMonthlyNet("");
 		setAnnualNet("");
-		setMonthlyNetAfterTax("");
-		setAnnualNetAfterTax("");
+		setMonthlyNetAfterTax("0");
+		setAnnualNetAfterTax("0");
 	};
 
 	return (
@@ -419,7 +421,7 @@ export default function SalaryCalculator() {
 						onValueChange={(value) => {
 							setSourceDeduction(value);
 						}}
-						step={0.1}
+						step={0.5}
 						minimumTrackTintColor="#e74c3c"
 						maximumTrackTintColor="#e0e0e0"
 						thumbTintColor="#e74c3c"
