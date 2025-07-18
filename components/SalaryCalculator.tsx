@@ -164,25 +164,25 @@ export default function SalaryCalculator() {
 	);
 
 	useEffect(() => {
-		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
 	useEffect(() => {
-		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
 	useEffect(() => {
-		if (monthlyGross && parseFloat(monthlyGross) > 0) {
+		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
 			updateAllFields("monthlyGross", monthlyGross);
 		}
 	}, [updateAllFields, monthlyGross]);
 
 	useEffect(() => {
-		if (monthlyNet && parseFloat(monthlyNet) > 0) {
+		if (monthlyNet.trim() !== "" && !Number.isNaN(parseFloat(monthlyNet))) {
 			const monthlyAfterTax = calculateAfterTax(parseFloat(monthlyNet));
 			const annualAfterTax = calculateAfterTax(parseFloat(annualNet));
 			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
@@ -211,7 +211,7 @@ export default function SalaryCalculator() {
 	};
 
 	const handleHourlyBlur = (value: string, setter: (value: string) => void) => {
-		if (value && parseFloat(value) > 0) {
+		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 			setter(formatHourlyRate(parseFloat(value)));
 		}
 		setFocusedInput(null);
@@ -250,7 +250,7 @@ export default function SalaryCalculator() {
 						value={hourlyGross}
 						onChangeText={(value) => {
 							setHourlyGross(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("hourlyGross", value);
 							}
 						}}
@@ -268,7 +268,7 @@ export default function SalaryCalculator() {
 						value={hourlyNet}
 						onChangeText={(value) => {
 							setHourlyNet(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("hourlyNet", value);
 							}
 						}}
@@ -292,7 +292,7 @@ export default function SalaryCalculator() {
 						value={monthlyGross}
 						onChangeText={(value) => {
 							setMonthlyGross(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("monthlyGross", value);
 							}
 						}}
@@ -310,7 +310,7 @@ export default function SalaryCalculator() {
 						value={monthlyNet}
 						onChangeText={(value) => {
 							setMonthlyNet(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("monthlyNet", value);
 							}
 						}}
@@ -331,7 +331,7 @@ export default function SalaryCalculator() {
 						value={annualGross}
 						onChangeText={(value) => {
 							setAnnualGross(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("annualGross", value);
 							}
 						}}
@@ -349,7 +349,7 @@ export default function SalaryCalculator() {
 						value={annualNet}
 						onChangeText={(value) => {
 							setAnnualNet(value);
-							if (value && parseFloat(value) > 0) {
+							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 								updateAllFields("annualNet", value);
 							}
 						}}
