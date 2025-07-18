@@ -31,6 +31,14 @@ export default function SalaryCalculator() {
 		{ label: "Portage salarial", value: "portage-salarial" },
 	];
 
+	const statusTooltips: Record<string, string> = {
+		"non-cadre": "Non-cadre -22%",
+		"cadre": "Cadre -25%",
+		"fonction-publique": "Public -17%",
+		"profession-liberale": "Indé -35%",
+		"portage-salarial": "Port -47%",
+	};
+
 	const bonusMonthOptions = [12, 13, 14, 15, 16];
 
 	const clearFields = () => {
@@ -80,7 +88,7 @@ export default function SalaryCalculator() {
 				<View style={styles.inputGroup}>
 					<Text style={styles.label}>
 						Mensuel brut
-						<Text style={styles.badgeText}> Non-cadre -22%</Text>
+						<Text style={styles.badgeText}> {statusTooltips[status]}</Text>
 					</Text>
 					<TextInput
 						style={styles.input}
