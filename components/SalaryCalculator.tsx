@@ -1,6 +1,7 @@
 import Slider from "@react-native-community/slider";
 import { useCallback, useEffect, useState } from "react";
 import {
+	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -196,7 +197,8 @@ export default function SalaryCalculator() {
 	};
 
 	return (
-		<ScrollView style={styles.container}>
+		<SafeAreaView style={styles.safeArea}>
+			<ScrollView style={styles.container}>
 			<View style={styles.header}>
 				<Text style={styles.title}>Calcul Du Salaire Brut En Net</Text>
 			</View>
@@ -458,11 +460,16 @@ export default function SalaryCalculator() {
 			<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
 				<Text style={styles.clearButtonText}>Effacer les champs</Text>
 			</TouchableOpacity>
-		</ScrollView>
+			</ScrollView>
+		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
+	safeArea: {
+		flex: 1,
+		backgroundColor: "#e74c3c",
+	},
 	container: {
 		flex: 1,
 		backgroundColor: "#e74c3c",
