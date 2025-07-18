@@ -158,16 +158,19 @@ export default function SalaryCalculator() {
 				<Text style={styles.sectionTitle}>
 					SÉLECTIONNEZ VOTRE TEMPS DE TRAVAIL : {workTimePercentage}%
 				</Text>
-				<Slider
-					style={styles.slider}
-					minimumValue={0}
-					maximumValue={100}
-					value={workTimePercentage}
-					onValueChange={setWorkTimePercentage}
-					step={1}
-					minimumTrackTintColor="#e74c3c"
-					maximumTrackTintColor="#bdc3c7"
-				/>
+				<View style={styles.sliderContainer}>
+					<Slider
+						style={styles.slider}
+						minimumValue={0}
+						maximumValue={100}
+						value={workTimePercentage}
+						onValueChange={setWorkTimePercentage}
+						step={1}
+						minimumTrackTintColor="#e74c3c"
+						maximumTrackTintColor="#e0e0e0"
+						thumbTintColor="#e74c3c"
+					/>
+				</View>
 			</View>
 
 			<View style={styles.bonusSection}>
@@ -210,16 +213,19 @@ export default function SalaryCalculator() {
 					SÉLECTIONNEZ LE TAUX DE PRÉLÈVEMENT À LA SOURCE:{" "}
 					{sourceDeduction.toFixed(1)}%
 				</Text>
-				<Slider
-					style={styles.slider}
-					minimumValue={0}
-					maximumValue={100}
-					value={sourceDeduction}
-					onValueChange={setSourceDeduction}
-					step={0.1}
-					minimumTrackTintColor="#e74c3c"
-					maximumTrackTintColor="#bdc3c7"
-				/>
+				<View style={styles.sliderContainer}>
+					<Slider
+						style={styles.slider}
+						minimumValue={0}
+						maximumValue={100}
+						value={sourceDeduction}
+						onValueChange={setSourceDeduction}
+						step={0.1}
+						minimumTrackTintColor="#e74c3c"
+						maximumTrackTintColor="#e0e0e0"
+						thumbTintColor="#e74c3c"
+					/>
+				</View>
 			</View>
 
 			<View style={styles.resultSection}>
@@ -357,6 +363,13 @@ const styles = StyleSheet.create({
 	},
 	sliderSection: {
 		marginVertical: 20,
+	},
+	sliderContainer: {
+		backgroundColor: "white",
+		borderRadius: 8,
+		paddingHorizontal: 15,
+		paddingVertical: 20,
+		marginTop: 10,
 	},
 	slider: {
 		width: "100%",
