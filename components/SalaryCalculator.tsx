@@ -1,5 +1,5 @@
 import Slider from "@react-native-community/slider";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	Platform,
 	ScrollView,
@@ -64,12 +64,6 @@ const formatHourlyRate = (value: number): string => {
 export default function SalaryCalculator() {
 	const statusBarHeight = StatusBar.currentHeight || 0;
 	const isIOS = Platform.OS === 'ios';
-	const [hourlyGross, setHourlyGross] = useState("");
-	const [monthlyGross, setMonthlyGross] = useState("");
-	const [annualGross, setAnnualGross] = useState("");
-	const [hourlyNet, setHourlyNet] = useState("");
-	const [monthlyNet, setMonthlyNet] = useState("");
-	const [annualNet, setAnnualNet] = useState("");
 	const [status, setStatus] = useState<Status>("non-cadre");
 	const [workTimePercentage, setWorkTimePercentage] = useState(100);
 	const [bonusMonths, setBonusMonths] = useState(12);
@@ -77,9 +71,10 @@ export default function SalaryCalculator() {
 	const [monthlyNetAfterTax, setMonthlyNetAfterTax] = useState("0");
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 	const [focusedInput, setFocusedInput] = useState<string | null>(null);
+	const [inputValues, setInputValues] = useState<Record<string, string>>({});
 	
 	// Internal exact values for precise calculations using BigNumber
-	const [_exactValues, setExactValues] = useState({
+	const [exactValues, setExactValues] = useState({
 		hourlyGross: new BigNumber(0),
 		monthlyGross: new BigNumber(0),
 		annualGross: new BigNumber(0),
@@ -89,6 +84,20 @@ export default function SalaryCalculator() {
 		monthlyNetAfterTax: new BigNumber(0),
 		annualNetAfterTax: new BigNumber(0),
 	});
+
+	// Computed display values from exact values (or raw input when focused)
+	const hourlyGross = focusedInput === "hourlyGross" ? (inputValues.hourlyGross || "") : 
+		(exactValues.hourlyGross.isZero() ? "" : formatHourlyRate(exactValues.hourlyGross.toNumber()));
+	const monthlyGross = focusedInput === "monthlyGross" ? (inputValues.monthlyGross || "") :
+		(exactValues.monthlyGross.isZero() ? "" : roundToWhole(exactValues.monthlyGross.toNumber()).toString());
+	const annualGross = focusedInput === "annualGross" ? (inputValues.annualGross || "") :
+		(exactValues.annualGross.isZero() ? "" : roundToWhole(exactValues.annualGross.toNumber()).toString());
+	const hourlyNet = focusedInput === "hourlyNet" ? (inputValues.hourlyNet || "") :
+		(exactValues.hourlyNet.isZero() ? "" : formatHourlyRate(exactValues.hourlyNet.toNumber()));
+	const monthlyNet = focusedInput === "monthlyNet" ? (inputValues.monthlyNet || "") :
+		(exactValues.monthlyNet.isZero() ? "" : roundToWhole(exactValues.monthlyNet.toNumber()).toString());
+	const annualNet = focusedInput === "annualNet" ? (inputValues.annualNet || "") :
+		(exactValues.annualNet.isZero() ? "" : roundToWhole(exactValues.annualNet.toNumber()).toString());
 
 	const getDeductionRate = useCallback((status: Status): number => {
 		return deductionRates[status];
@@ -165,7 +174,7 @@ export default function SalaryCalculator() {
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
 
-			// Store exact values internally
+			// Store exact values internally (computed display values will update automatically)
 			setExactValues({
 				hourlyGross: hourlyGrossValue,
 				monthlyGross: monthlyGrossValue,
@@ -177,25 +186,7 @@ export default function SalaryCalculator() {
 				annualNetAfterTax: annualAfterTax,
 			});
 
-			// Update display values with proper rounding (convert BigNumber to number for display)
-			if (focusedInput !== "hourlyGross") {
-				setHourlyGross(formatHourlyRate(hourlyGrossValue.toNumber()));
-			}
-			if (focusedInput !== "monthlyGross") {
-				setMonthlyGross(roundToWhole(monthlyGrossValue.toNumber()).toString());
-			}
-			if (focusedInput !== "annualGross") {
-				setAnnualGross(roundToWhole(annualGrossValue.toNumber()).toString());
-			}
-			if (focusedInput !== "hourlyNet") {
-				setHourlyNet(formatHourlyRate(hourlyNetValue.toNumber()));
-			}
-			if (focusedInput !== "monthlyNet") {
-				setMonthlyNet(roundToWhole(monthlyNetValue.toNumber()).toString());
-			}
-			if (focusedInput !== "annualNet") {
-				setAnnualNet(roundToWhole(annualNetValue.toNumber()).toString());
-			}
+			// Update after-tax display values
 			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax.toNumber()).toString());
 			setAnnualNetAfterTax(roundToWhole(annualAfterTax.toNumber()).toString());
 		},
@@ -204,38 +195,9 @@ export default function SalaryCalculator() {
 			calculateFromGrossToNet,
 			calculateFromNetToGross,
 			calculateAfterTax,
-			focusedInput,
 		],
 	);
 
-	useEffect(() => {
-		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
-			updateAllFields("monthlyGross", monthlyGross);
-		}
-	}, [updateAllFields, monthlyGross]);
-
-	useEffect(() => {
-		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
-			updateAllFields("monthlyGross", monthlyGross);
-		}
-	}, [updateAllFields, monthlyGross]);
-
-	useEffect(() => {
-		if (monthlyGross.trim() !== "" && !Number.isNaN(parseFloat(monthlyGross))) {
-			updateAllFields("monthlyGross", monthlyGross);
-		}
-	}, [updateAllFields, monthlyGross]);
-
-	useEffect(() => {
-		if (monthlyNet.trim() !== "" && !Number.isNaN(parseFloat(monthlyNet))) {
-			const monthlyNetBig = new BigNumber(monthlyNet);
-			const annualNetBig = new BigNumber(annualNet);
-			const monthlyAfterTax = calculateAfterTax(monthlyNetBig);
-			const annualAfterTax = calculateAfterTax(annualNetBig);
-			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax.toNumber()).toString());
-			setAnnualNetAfterTax(roundToWhole(annualAfterTax.toNumber()).toString());
-		}
-	}, [calculateAfterTax, monthlyNet, annualNet]);
 
 	const statusOptions: Array<{ label: string; value: Status }> = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
@@ -251,29 +213,48 @@ export default function SalaryCalculator() {
 
 	const handleInputFocus = (fieldName: string) => {
 		setFocusedInput(fieldName);
+		// Store current computed value as input value when focusing
+		const currentValue = (() => {
+			switch(fieldName) {
+				case "hourlyGross": return exactValues.hourlyGross.isZero() ? "" : exactValues.hourlyGross.toString();
+				case "monthlyGross": return exactValues.monthlyGross.isZero() ? "" : exactValues.monthlyGross.toString();
+				case "annualGross": return exactValues.annualGross.isZero() ? "" : exactValues.annualGross.toString();
+				case "hourlyNet": return exactValues.hourlyNet.isZero() ? "" : exactValues.hourlyNet.toString();
+				case "monthlyNet": return exactValues.monthlyNet.isZero() ? "" : exactValues.monthlyNet.toString();
+				case "annualNet": return exactValues.annualNet.isZero() ? "" : exactValues.annualNet.toString();
+				default: return "";
+			}
+		})();
+		setInputValues(prev => ({ ...prev, [fieldName]: currentValue }));
 	};
 
 	const handleInputBlur = () => {
 		setFocusedInput(null);
+		setInputValues({});
 	};
 
-	const handleHourlyBlur = (value: string, setter: (value: string) => void) => {
+	const handleHourlyBlur = (fieldName: string, value: string) => {
 		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-			setter(formatHourlyRate(parseFloat(value)));
+			// Format the value and trigger calculation
+			const formattedValue = formatHourlyRate(parseFloat(value));
+			updateAllFields(fieldName as "hourlyGross" | "hourlyNet", formattedValue);
 		}
 		setFocusedInput(null);
+		setInputValues({});
+	};
+
+	const handleInputChange = (fieldName: string, value: string) => {
+		setInputValues(prev => ({ ...prev, [fieldName]: value }));
+		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
+			updateAllFields(fieldName as "hourlyGross" | "monthlyGross" | "annualGross" | "hourlyNet" | "monthlyNet" | "annualNet", value);
+		}
 	};
 
 	const clearFields = () => {
-		setHourlyGross("");
-		setMonthlyGross("");
-		setAnnualGross("");
-		setHourlyNet("");
-		setMonthlyNet("");
-		setAnnualNet("");
 		setMonthlyNetAfterTax("0");
 		setAnnualNetAfterTax("0");
 		setFocusedInput(null);
+		setInputValues({});
 		setExactValues({
 			hourlyGross: new BigNumber(0),
 			monthlyGross: new BigNumber(0),
@@ -305,14 +286,9 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={hourlyGross}
-						onChangeText={(value) => {
-							setHourlyGross(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("hourlyGross", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("hourlyGross", value)}
 						onFocus={() => handleInputFocus("hourlyGross")}
-						onBlur={() => handleHourlyBlur(hourlyGross, setHourlyGross)}
+						onBlur={() => handleHourlyBlur("hourlyGross", inputValues.hourlyGross || "")}
 						keyboardType="numeric"
 						placeholder="ex : 9.88"
 						placeholderTextColor="#e74c3c"
@@ -323,14 +299,9 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={hourlyNet}
-						onChangeText={(value) => {
-							setHourlyNet(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("hourlyNet", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("hourlyNet", value)}
 						onFocus={() => handleInputFocus("hourlyNet")}
-						onBlur={() => handleHourlyBlur(hourlyNet, setHourlyNet)}
+						onBlur={() => handleHourlyBlur("hourlyNet", inputValues.hourlyNet || "")}
 						keyboardType="numeric"
 						placeholder="Horaire"
 						placeholderTextColor="#e74c3c"
@@ -347,12 +318,7 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={monthlyGross}
-						onChangeText={(value) => {
-							setMonthlyGross(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("monthlyGross", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("monthlyGross", value)}
 						onFocus={() => handleInputFocus("monthlyGross")}
 						onBlur={handleInputBlur}
 						keyboardType="numeric"
@@ -365,12 +331,7 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={monthlyNet}
-						onChangeText={(value) => {
-							setMonthlyNet(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("monthlyNet", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("monthlyNet", value)}
 						onFocus={() => handleInputFocus("monthlyNet")}
 						onBlur={handleInputBlur}
 						keyboardType="numeric"
@@ -386,12 +347,7 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={annualGross}
-						onChangeText={(value) => {
-							setAnnualGross(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("annualGross", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("annualGross", value)}
 						onFocus={() => handleInputFocus("annualGross")}
 						onBlur={handleInputBlur}
 						keyboardType="numeric"
@@ -404,12 +360,7 @@ export default function SalaryCalculator() {
 					<TextInput
 						style={styles.input}
 						value={annualNet}
-						onChangeText={(value) => {
-							setAnnualNet(value);
-							if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-								updateAllFields("annualNet", value);
-							}
-						}}
+						onChangeText={(value) => handleInputChange("annualNet", value)}
 						onFocus={() => handleInputFocus("annualNet")}
 						onBlur={handleInputBlur}
 						keyboardType="numeric"
