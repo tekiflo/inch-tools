@@ -1,8 +1,9 @@
 import Slider from "@react-native-community/slider";
 import { useCallback, useEffect, useState } from "react";
 import {
-	SafeAreaView,
+	Platform,
 	ScrollView,
+	StatusBar,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -47,6 +48,8 @@ const formatHourlyRate = (value: number): string => {
 };
 
 export default function SalaryCalculator() {
+	const statusBarHeight = StatusBar.currentHeight || 0;
+	const isIOS = Platform.OS === 'ios';
 	const [hourlyGross, setHourlyGross] = useState("");
 	const [monthlyGross, setMonthlyGross] = useState("");
 	const [annualGross, setAnnualGross] = useState("");
@@ -197,8 +200,9 @@ export default function SalaryCalculator() {
 	};
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
-			<ScrollView style={styles.container}>
+		<View style={styles.safeArea}>
+			<StatusBar backgroundColor="#e74c3c" barStyle="light-content" />
+			<ScrollView style={[styles.container, { paddingTop: isIOS ? 44 : statusBarHeight + 20 }]}>
 			<View style={styles.header}>
 				<Text style={styles.title}>Calcul Du Salaire Brut En Net</Text>
 			</View>
@@ -461,7 +465,7 @@ export default function SalaryCalculator() {
 				<Text style={styles.clearButtonText}>Effacer les champs</Text>
 			</TouchableOpacity>
 			</ScrollView>
-		</SafeAreaView>
+		</View>
 	);
 }
 
@@ -474,7 +478,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#e74c3c",
 		paddingHorizontal: 20,
-		paddingTop: 20,
 	},
 	header: {
 		alignItems: "center",
