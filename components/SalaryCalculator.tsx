@@ -1,7 +1,6 @@
 import Slider from "@react-native-community/slider";
 import { useCallback, useEffect, useState } from "react";
 import {
-	Dimensions,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -47,8 +46,6 @@ const formatHourlyRate = (value: number): string => {
 };
 
 export default function SalaryCalculator() {
-	const screenWidth = Dimensions.get("window").width;
-	const isWideScreen = screenWidth >= 768;
 	const [hourlyGross, setHourlyGross] = useState("");
 	const [monthlyGross, setMonthlyGross] = useState("");
 	const [annualGross, setAnnualGross] = useState("");
@@ -204,271 +201,263 @@ export default function SalaryCalculator() {
 				<Text style={styles.title}>Calcul Du Salaire Brut En Net</Text>
 			</View>
 
-			<View style={[styles.mainContent, isWideScreen && styles.mainContentWide]}>
-				<View style={[styles.leftColumn, isWideScreen && styles.leftColumnWide]}>
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
-						<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
-					</View>
+			<View style={styles.section}>
+				<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
+				<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
+			</View>
 
-					<View style={styles.inputRow}>
-						<View style={styles.inputGroup}>
-							<Text style={styles.labelText}>Horaire brut</Text>
-							<TextInput
-								style={styles.input}
-								value={hourlyGross}
-								onChangeText={(value) => {
-									setHourlyGross(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("hourlyGross", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="ex : 9.88"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-						<View style={styles.inputGroup}>
-							<Text style={styles.labelText}>Horaire net</Text>
-							<TextInput
-								style={styles.input}
-								value={hourlyNet}
-								onChangeText={(value) => {
-									setHourlyNet(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("hourlyNet", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="Horaire"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-					</View>
-
-					<View style={styles.inputRow}>
-						<View style={styles.inputGroup}>
-							<View style={styles.label}>
-								<Text style={styles.labelText}>Mensuel brut</Text>
-								<Text style={styles.badgeText}>{statusTooltips[status]}</Text>
-							</View>
-							<TextInput
-								style={styles.input}
-								value={monthlyGross}
-								onChangeText={(value) => {
-									setMonthlyGross(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("monthlyGross", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="ex : 1498"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-						<View style={styles.inputGroup}>
-							<Text style={styles.labelText}>Mensuel net</Text>
-							<TextInput
-								style={styles.input}
-								value={monthlyNet}
-								onChangeText={(value) => {
-									setMonthlyNet(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("monthlyNet", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="Mensuel"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-					</View>
-
-					<View style={styles.inputRow}>
-						<View style={styles.inputGroup}>
-							<Text style={styles.labelText}>Annuel brut</Text>
-							<TextInput
-								style={styles.input}
-								value={annualGross}
-								onChangeText={(value) => {
-									setAnnualGross(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("annualGross", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="ex : 17976"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-						<View style={styles.inputGroup}>
-							<Text style={styles.labelText}>Annuel net</Text>
-							<TextInput
-								style={styles.input}
-								value={annualNet}
-								onChangeText={(value) => {
-									setAnnualNet(value);
-									if (value && parseFloat(value) > 0) {
-										updateAllFields("annualNet", value);
-									}
-								}}
-								keyboardType="numeric"
-								placeholder="Annuel"
-								placeholderTextColor="#e74c3c"
-							/>
-						</View>
-					</View>
-
-					<View style={styles.statusSection}>
-						<Text style={styles.sectionTitle}>Sélectionnez votre statut :</Text>
-						<View style={styles.statusOptions}>
-							{statusOptions.map((option) => (
-								<TouchableOpacity
-									key={option.value}
-									style={[
-										styles.statusOption,
-										status === option.value && styles.statusOptionSelected,
-									]}
-									onPress={() => {
-										setStatus(option.value);
-									}}
-								>
-									<View
-										style={[
-											styles.radio,
-											status === option.value && styles.radioSelected,
-										]}
-									>
-										{status === option.value && <View style={styles.radioInner} />}
-									</View>
-									<Text
-										style={[
-											styles.statusLabel,
-											status === option.value && styles.statusLabelSelected,
-										]}
-									>
-										{option.label}
-									</Text>
-								</TouchableOpacity>
-							))}
-						</View>
-					</View>
+			<View style={styles.inputRow}>
+				<View style={styles.inputGroup}>
+					<Text style={styles.labelText}>Horaire brut</Text>
+					<TextInput
+						style={styles.input}
+						value={hourlyGross}
+						onChangeText={(value) => {
+							setHourlyGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("hourlyGross", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="ex : 9.88"
+						placeholderTextColor="#e74c3c"
+					/>
 				</View>
+				<View style={styles.inputGroup}>
+					<Text style={styles.labelText}>Horaire net</Text>
+					<TextInput
+						style={styles.input}
+						value={hourlyNet}
+						onChangeText={(value) => {
+							setHourlyNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("hourlyNet", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="Horaire"
+						placeholderTextColor="#e74c3c"
+					/>
+				</View>
+			</View>
 
-				<View style={[styles.rightColumn, isWideScreen && styles.rightColumnWide]}>
-					<View style={styles.sliderSection}>
-						<Text style={styles.sectionTitle}>
-							Sélectionnez votre temps de travail : {workTimePercentage}%
-						</Text>
-						<View style={styles.sliderContainer}>
-							<Slider
-								style={styles.slider}
-								minimumValue={10}
-								maximumValue={100}
-								value={workTimePercentage}
-								onValueChange={(value) => {
-									setWorkTimePercentage(value);
-								}}
-								step={10}
-								minimumTrackTintColor="#e74c3c"
-								maximumTrackTintColor="#e0e0e0"
-								thumbTintColor="#e74c3c"
-							/>
-						</View>
+			<View style={styles.inputRow}>
+				<View style={styles.inputGroup}>
+					<View style={styles.label}>
+						<Text style={styles.labelText}>Mensuel brut</Text>
+						<Text style={styles.badgeText}>{statusTooltips[status]}</Text>
 					</View>
+					<TextInput
+						style={styles.input}
+						value={monthlyGross}
+						onChangeText={(value) => {
+							setMonthlyGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("monthlyGross", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="ex : 1498"
+						placeholderTextColor="#e74c3c"
+					/>
+				</View>
+				<View style={styles.inputGroup}>
+					<Text style={styles.labelText}>Mensuel net</Text>
+					<TextInput
+						style={styles.input}
+						value={monthlyNet}
+						onChangeText={(value) => {
+							setMonthlyNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("monthlyNet", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="Mensuel"
+						placeholderTextColor="#e74c3c"
+					/>
+				</View>
+			</View>
 
-					<View style={styles.bonusSection}>
-						<Text style={styles.sectionTitle}>
-							Sélectionnez le nombre de mois de prime conventionnelle:
-						</Text>
-						<View style={styles.bonusOptions}>
-							{bonusMonthOptions.map((months) => (
-								<TouchableOpacity
-									key={months}
-									style={[
-										styles.bonusOption,
-										bonusMonths === months && styles.bonusOptionSelected,
-									]}
-									onPress={() => {
-										setBonusMonths(months);
-									}}
-								>
-									<View
-										style={[
-											styles.radio,
-											bonusMonths === months && styles.radioSelected,
-										]}
-									>
-										{bonusMonths === months && <View style={styles.radioInner} />}
-									</View>
-									<Text
-										style={[
-											styles.bonusLabel,
-											bonusMonths === months && styles.bonusLabelSelected,
-										]}
-									>
-										{months} mois
-									</Text>
-								</TouchableOpacity>
-							))}
-						</View>
-					</View>
+			<View style={styles.inputRow}>
+				<View style={styles.inputGroup}>
+					<Text style={styles.labelText}>Annuel brut</Text>
+					<TextInput
+						style={styles.input}
+						value={annualGross}
+						onChangeText={(value) => {
+							setAnnualGross(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("annualGross", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="ex : 17976"
+						placeholderTextColor="#e74c3c"
+					/>
+				</View>
+				<View style={styles.inputGroup}>
+					<Text style={styles.labelText}>Annuel net</Text>
+					<TextInput
+						style={styles.input}
+						value={annualNet}
+						onChangeText={(value) => {
+							setAnnualNet(value);
+							if (value && parseFloat(value) > 0) {
+								updateAllFields("annualNet", value);
+							}
+						}}
+						keyboardType="numeric"
+						placeholder="Annuel"
+						placeholderTextColor="#e74c3c"
+					/>
+				</View>
+			</View>
 
-					<View style={styles.deductionSection}>
-						<Text style={styles.sectionTitle}>
-							Sélectionnez le taux de prélèvement à la source:{" "}
-							{sourceDeduction.toFixed(1)}%
-						</Text>
-						<View style={styles.sliderContainer}>
-							<Slider
-								style={styles.slider}
-								minimumValue={0}
-								maximumValue={100}
-								value={sourceDeduction}
-								onValueChange={(value) => {
-									setSourceDeduction(value);
-								}}
-								step={0.5}
-								minimumTrackTintColor="#e74c3c"
-								maximumTrackTintColor="#e0e0e0"
-								thumbTintColor="#e74c3c"
-							/>
-						</View>
-					</View>
-
-					<View style={styles.resultSection}>
-						<Text style={styles.resultTitle}>
-							Estimation de votre salaire net après le prélèvement à la source
-						</Text>
-						<View style={styles.resultRow}>
-							<View style={styles.resultGroup}>
-								<Text style={styles.resultLabel}>Mensuel net après impôts</Text>
-								<TextInput
-									style={styles.resultInput}
-									value={monthlyNetAfterTax}
-									onChangeText={setMonthlyNetAfterTax}
-									keyboardType="numeric"
-								/>
+			<View style={styles.statusSection}>
+				<Text style={styles.sectionTitle}>Sélectionnez votre statut :</Text>
+				<View style={styles.statusOptions}>
+					{statusOptions.map((option) => (
+						<TouchableOpacity
+							key={option.value}
+							style={[
+								styles.statusOption,
+								status === option.value && styles.statusOptionSelected,
+							]}
+							onPress={() => {
+								setStatus(option.value);
+							}}
+						>
+							<View
+								style={[
+									styles.radio,
+									status === option.value && styles.radioSelected,
+								]}
+							>
+								{status === option.value && <View style={styles.radioInner} />}
 							</View>
-							<View style={styles.resultGroup}>
-								<Text style={styles.resultLabel}>Annuel net après impôts</Text>
-								<TextInput
-									style={styles.resultInput}
-									value={annualNetAfterTax}
-									onChangeText={setAnnualNetAfterTax}
-									keyboardType="numeric"
-								/>
+							<Text
+								style={[
+									styles.statusLabel,
+									status === option.value && styles.statusLabelSelected,
+								]}
+							>
+								{option.label}
+							</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+			</View>
+
+			<View style={styles.sliderSection}>
+				<Text style={styles.sectionTitle}>
+					Sélectionnez votre temps de travail : {workTimePercentage}%
+				</Text>
+				<View style={styles.sliderContainer}>
+					<Slider
+						style={styles.slider}
+						minimumValue={10}
+						maximumValue={100}
+						value={workTimePercentage}
+						onValueChange={(value) => {
+							setWorkTimePercentage(value);
+						}}
+						step={10}
+						minimumTrackTintColor="#e74c3c"
+						maximumTrackTintColor="#e0e0e0"
+						thumbTintColor="#e74c3c"
+					/>
+				</View>
+			</View>
+
+			<View style={styles.bonusSection}>
+				<Text style={styles.sectionTitle}>
+					Sélectionnez le nombre de mois de prime conventionnelle:
+				</Text>
+				<View style={styles.bonusOptions}>
+					{bonusMonthOptions.map((months) => (
+						<TouchableOpacity
+							key={months}
+							style={[
+								styles.bonusOption,
+								bonusMonths === months && styles.bonusOptionSelected,
+							]}
+							onPress={() => {
+								setBonusMonths(months);
+							}}
+						>
+							<View
+								style={[
+									styles.radio,
+									bonusMonths === months && styles.radioSelected,
+								]}
+							>
+								{bonusMonths === months && <View style={styles.radioInner} />}
 							</View>
-						</View>
+							<Text
+								style={[
+									styles.bonusLabel,
+									bonusMonths === months && styles.bonusLabelSelected,
+								]}
+							>
+								{months} mois
+							</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+			</View>
+
+			<View style={styles.deductionSection}>
+				<Text style={styles.sectionTitle}>
+					Sélectionnez le taux de prélèvement à la source:{" "}
+					{sourceDeduction.toFixed(1)}%
+				</Text>
+				<View style={styles.sliderContainer}>
+					<Slider
+						style={styles.slider}
+						minimumValue={0}
+						maximumValue={100}
+						value={sourceDeduction}
+						onValueChange={(value) => {
+							setSourceDeduction(value);
+						}}
+						step={0.5}
+						minimumTrackTintColor="#e74c3c"
+						maximumTrackTintColor="#e0e0e0"
+						thumbTintColor="#e74c3c"
+					/>
+				</View>
+			</View>
+
+			<View style={styles.resultSection}>
+				<Text style={styles.resultTitle}>
+					Estimation de votre salaire net après le prélèvement à la source
+				</Text>
+				<View style={styles.resultRow}>
+					<View style={styles.resultGroup}>
+						<Text style={styles.resultLabel}>Mensuel net après impôts</Text>
+						<TextInput
+							style={styles.resultInput}
+							value={monthlyNetAfterTax}
+							onChangeText={setMonthlyNetAfterTax}
+							keyboardType="numeric"
+						/>
+					</View>
+					<View style={styles.resultGroup}>
+						<Text style={styles.resultLabel}>Annuel net après impôts</Text>
+						<TextInput
+							style={styles.resultInput}
+							value={annualNetAfterTax}
+							onChangeText={setAnnualNetAfterTax}
+							keyboardType="numeric"
+						/>
 					</View>
 				</View>
 			</View>
 
-			<View style={styles.buttonContainer}>
-				<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
-					<Text style={styles.clearButtonText}>Effacer les champs</Text>
-				</TouchableOpacity>
-			</View>
+			<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
+				<Text style={styles.clearButtonText}>Effacer les champs</Text>
+			</TouchableOpacity>
 		</ScrollView>
 	);
 }
@@ -668,38 +657,5 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		fontWeight: "bold",
 		textTransform: "uppercase",
-	},
-	mainContent: {
-		flexDirection: "column",
-		alignItems: "center",
-	},
-	mainContentWide: {
-		flexDirection: "row",
-		alignItems: "flex-start",
-		justifyContent: "center",
-		maxWidth: 1200,
-		width: "100%",
-	},
-	leftColumn: {
-		width: "100%",
-		maxWidth: 500,
-	},
-	leftColumnWide: {
-		flex: 1,
-		paddingRight: 10,
-		maxWidth: undefined,
-	},
-	rightColumn: {
-		width: "100%",
-		maxWidth: 500,
-	},
-	rightColumnWide: {
-		flex: 1,
-		paddingLeft: 10,
-		maxWidth: undefined,
-	},
-	buttonContainer: {
-		alignItems: "center",
-		marginTop: 20,
 	},
 });
