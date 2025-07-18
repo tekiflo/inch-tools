@@ -42,8 +42,21 @@ const generateStatusTooltips = (
 	};
 };
 
+const roundToDecimals = (value: number, decimals: number): number => {
+	const factor = 10 ** decimals;
+	return Math.round(value * factor) / factor;
+};
+
+const roundToCents = (value: number): number => {
+	return roundToDecimals(value, 2);
+};
+
+const roundToWhole = (value: number): number => {
+	return Math.round(value);
+};
+
 const formatHourlyRate = (value: number): string => {
-	const rounded = Math.round(value * 100) / 100;
+	const rounded = roundToCents(value);
 	return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(2);
 };
 
@@ -123,12 +136,12 @@ export default function SalaryCalculator() {
 				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
 			}
 
-			const hourlyGrossValue = monthlyGrossValue / 151.67;
-			const annualGrossValue = monthlyGrossValue * bonusMonths;
+			const hourlyGrossValue = roundToCents(monthlyGrossValue / 151.67);
+			const annualGrossValue = roundToCents(monthlyGrossValue * bonusMonths);
 
-			const monthlyNetValue = calculateFromGrossToNet(monthlyGrossValue);
-			const hourlyNetValue = monthlyNetValue / 151.67;
-			const annualNetValue = monthlyNetValue * bonusMonths;
+			const monthlyNetValue = roundToCents(calculateFromGrossToNet(monthlyGrossValue));
+			const hourlyNetValue = roundToCents(monthlyNetValue / 151.67);
+			const annualNetValue = roundToCents(monthlyNetValue * bonusMonths);
 
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
@@ -137,22 +150,22 @@ export default function SalaryCalculator() {
 				setHourlyGross(formatHourlyRate(hourlyGrossValue));
 			}
 			if (focusedInput !== "monthlyGross") {
-				setMonthlyGross(monthlyGrossValue.toFixed(0));
+				setMonthlyGross(roundToWhole(monthlyGrossValue).toString());
 			}
 			if (focusedInput !== "annualGross") {
-				setAnnualGross(annualGrossValue.toFixed(0));
+				setAnnualGross(roundToWhole(annualGrossValue).toString());
 			}
 			if (focusedInput !== "hourlyNet") {
 				setHourlyNet(formatHourlyRate(hourlyNetValue));
 			}
 			if (focusedInput !== "monthlyNet") {
-				setMonthlyNet(monthlyNetValue.toFixed(0));
+				setMonthlyNet(roundToWhole(monthlyNetValue).toString());
 			}
 			if (focusedInput !== "annualNet") {
-				setAnnualNet(annualNetValue.toFixed(0));
+				setAnnualNet(roundToWhole(annualNetValue).toString());
 			}
-			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
-			setAnnualNetAfterTax(annualAfterTax.toFixed(0));
+			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax).toString());
+			setAnnualNetAfterTax(roundToWhole(annualAfterTax).toString());
 		},
 		[
 			bonusMonths,
@@ -185,8 +198,8 @@ export default function SalaryCalculator() {
 		if (monthlyNet.trim() !== "" && !Number.isNaN(parseFloat(monthlyNet))) {
 			const monthlyAfterTax = calculateAfterTax(parseFloat(monthlyNet));
 			const annualAfterTax = calculateAfterTax(parseFloat(annualNet));
-			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
-			setAnnualNetAfterTax(annualAfterTax.toFixed(0));
+			setMonthlyNetAfterTax(monthlyAfterTax.toString());
+			setAnnualNetAfterTax(annualAfterTax.toString());
 		}
 	}, [calculateAfterTax, monthlyNet, annualNet]);
 
