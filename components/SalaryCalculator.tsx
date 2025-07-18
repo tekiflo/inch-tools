@@ -205,7 +205,7 @@ export default function SalaryCalculator() {
 			</View>
 
 			<View style={[styles.mainContent, isWideScreen && styles.mainContentWide]}>
-				<View style={styles.leftColumn}>
+				<View style={[styles.leftColumn, isWideScreen && styles.leftColumnWide]}>
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
 						<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
@@ -355,7 +355,7 @@ export default function SalaryCalculator() {
 					</View>
 				</View>
 
-				<View style={styles.rightColumn}>
+				<View style={[styles.rightColumn, isWideScreen && styles.rightColumnWide]}>
 					<View style={styles.sliderSection}>
 						<Text style={styles.sectionTitle}>
 							Sélectionnez votre temps de travail : {workTimePercentage}%
@@ -671,18 +671,29 @@ const styles = StyleSheet.create({
 	},
 	mainContent: {
 		flexDirection: "column",
+		alignItems: "center",
 	},
 	mainContentWide: {
 		flexDirection: "row",
 		alignItems: "flex-start",
 	},
 	leftColumn: {
+		width: "100%",
+		maxWidth: 500,
+	},
+	leftColumnWide: {
 		flex: 1,
 		paddingRight: 10,
+		maxWidth: undefined,
 	},
 	rightColumn: {
+		width: "100%",
+		maxWidth: 500,
+	},
+	rightColumnWide: {
 		flex: 1,
 		paddingLeft: 10,
+		maxWidth: undefined,
 	},
 	buttonContainer: {
 		alignItems: "center",
