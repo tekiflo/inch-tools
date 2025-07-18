@@ -38,6 +38,11 @@ const generateStatusTooltips = (rates: Record<Status, number>): Record<Status, s
 	};
 };
 
+const formatHourlyRate = (value: number): string => {
+	const rounded = Math.round(value * 100) / 100;
+	return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(2);
+};
+
 export default function SalaryCalculator() {
 	const [hourlyGross, setHourlyGross] = useState("");
 	const [monthlyGross, setMonthlyGross] = useState("");
@@ -121,10 +126,10 @@ export default function SalaryCalculator() {
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
 
-			setHourlyGross(hourlyGrossValue.toFixed(2));
+			setHourlyGross(formatHourlyRate(hourlyGrossValue));
 			setMonthlyGross(monthlyGrossValue.toFixed(0));
 			setAnnualGross(annualGrossValue.toFixed(0));
-			setHourlyNet(hourlyNetValue.toFixed(2));
+			setHourlyNet(formatHourlyRate(hourlyNetValue));
 			setMonthlyNet(monthlyNetValue.toFixed(0));
 			setAnnualNet(annualNetValue.toFixed(0));
 			setMonthlyNetAfterTax(monthlyAfterTax.toFixed(0));
