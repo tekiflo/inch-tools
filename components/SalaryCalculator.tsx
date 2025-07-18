@@ -11,6 +11,7 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
+import BigNumber from "bignumber.js";
 
 const StatusEnum = z.enum([
 	"non-cadre",
@@ -77,16 +78,16 @@ export default function SalaryCalculator() {
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 	const [focusedInput, setFocusedInput] = useState<string | null>(null);
 	
-	// Internal exact values for precise calculations
+	// Internal exact values for precise calculations using BigNumber
 	const [_exactValues, setExactValues] = useState({
-		hourlyGross: 0,
-		monthlyGross: 0,
-		annualGross: 0,
-		hourlyNet: 0,
-		monthlyNet: 0,
-		annualNet: 0,
-		monthlyNetAfterTax: 0,
-		annualNetAfterTax: 0,
+		hourlyGross: new BigNumber(0),
+		monthlyGross: new BigNumber(0),
+		annualGross: new BigNumber(0),
+		hourlyNet: new BigNumber(0),
+		monthlyNet: new BigNumber(0),
+		annualNet: new BigNumber(0),
+		monthlyNetAfterTax: new BigNumber(0),
+		annualNetAfterTax: new BigNumber(0),
 	});
 
 	const getDeductionRate = useCallback((status: Status): number => {
@@ -94,26 +95,31 @@ export default function SalaryCalculator() {
 	}, []);
 
 	const calculateFromGrossToNet = useCallback(
-		(grossAmount: number): number => {
-			const deductionRate = getDeductionRate(status);
-			const workTimeFactor = workTimePercentage / 100;
-			return grossAmount * (1 - deductionRate) * workTimeFactor;
+		(grossAmount: BigNumber): BigNumber => {
+			const deductionRate = new BigNumber(getDeductionRate(status));
+			const workTimeFactor = new BigNumber(workTimePercentage).dividedBy(100);
+			const oneMinusDeduction = new BigNumber(1).minus(deductionRate);
+			return grossAmount.multipliedBy(oneMinusDeduction).multipliedBy(workTimeFactor);
 		},
 		[getDeductionRate, status, workTimePercentage],
 	);
 
 	const calculateFromNetToGross = useCallback(
-		(netAmount: number): number => {
-			const deductionRate = getDeductionRate(status);
-			const workTimeFactor = workTimePercentage / 100;
-			return netAmount / ((1 - deductionRate) * workTimeFactor);
+		(netAmount: BigNumber): BigNumber => {
+			const deductionRate = new BigNumber(getDeductionRate(status));
+			const workTimeFactor = new BigNumber(workTimePercentage).dividedBy(100);
+			const oneMinusDeduction = new BigNumber(1).minus(deductionRate);
+			const denominator = oneMinusDeduction.multipliedBy(workTimeFactor);
+			return netAmount.dividedBy(denominator);
 		},
 		[getDeductionRate, status, workTimePercentage],
 	);
 
 	const calculateAfterTax = useCallback(
-		(netAmount: number): number => {
-			return netAmount * (1 - sourceDeduction / 100);
+		(netAmount: BigNumber): BigNumber => {
+			const sourceDeductionRate = new BigNumber(sourceDeduction).dividedBy(100);
+			const oneMinusDeduction = new BigNumber(1).minus(sourceDeductionRate);
+			return netAmount.multipliedBy(oneMinusDeduction);
 		},
 		[sourceDeduction],
 	);
@@ -129,31 +135,32 @@ export default function SalaryCalculator() {
 				| "annualNet",
 			value: string,
 		) => {
-			const numValue = parseFloat(value) || 0;
-			let monthlyGrossValue = 0;
+			const numValue = new BigNumber(parseFloat(value) || 0);
+			const hoursPerMonth = new BigNumber(151.67);
+			let monthlyGrossValue = new BigNumber(0);
 
 			if (source === "hourlyGross") {
-				monthlyGrossValue = numValue * 151.67;
+				monthlyGrossValue = numValue.multipliedBy(hoursPerMonth);
 			} else if (source === "monthlyGross") {
 				monthlyGrossValue = numValue;
 			} else if (source === "annualGross") {
-				monthlyGrossValue = numValue / bonusMonths;
+				monthlyGrossValue = numValue.dividedBy(bonusMonths);
 			} else if (source === "hourlyNet") {
-				const monthlyNetValue = numValue * 151.67;
+				const monthlyNetValue = numValue.multipliedBy(hoursPerMonth);
 				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
 			} else if (source === "monthlyNet") {
 				monthlyGrossValue = calculateFromNetToGross(numValue);
 			} else if (source === "annualNet") {
-				const monthlyNetValue = numValue / bonusMonths;
+				const monthlyNetValue = numValue.dividedBy(bonusMonths);
 				monthlyGrossValue = calculateFromNetToGross(monthlyNetValue);
 			}
 
-			const hourlyGrossValue = monthlyGrossValue / 151.67;
-			const annualGrossValue = monthlyGrossValue * bonusMonths;
+			const hourlyGrossValue = monthlyGrossValue.dividedBy(hoursPerMonth);
+			const annualGrossValue = monthlyGrossValue.multipliedBy(bonusMonths);
 
 			const monthlyNetValue = calculateFromGrossToNet(monthlyGrossValue);
-			const hourlyNetValue = monthlyNetValue / 151.67;
-			const annualNetValue = monthlyNetValue * bonusMonths;
+			const hourlyNetValue = monthlyNetValue.dividedBy(hoursPerMonth);
+			const annualNetValue = monthlyNetValue.multipliedBy(bonusMonths);
 
 			const monthlyAfterTax = calculateAfterTax(monthlyNetValue);
 			const annualAfterTax = calculateAfterTax(annualNetValue);
@@ -170,27 +177,27 @@ export default function SalaryCalculator() {
 				annualNetAfterTax: annualAfterTax,
 			});
 
-			// Update display values with proper rounding
+			// Update display values with proper rounding (convert BigNumber to number for display)
 			if (focusedInput !== "hourlyGross") {
-				setHourlyGross(formatHourlyRate(hourlyGrossValue));
+				setHourlyGross(formatHourlyRate(hourlyGrossValue.toNumber()));
 			}
 			if (focusedInput !== "monthlyGross") {
-				setMonthlyGross(roundToWhole(monthlyGrossValue).toString());
+				setMonthlyGross(roundToWhole(monthlyGrossValue.toNumber()).toString());
 			}
 			if (focusedInput !== "annualGross") {
-				setAnnualGross(roundToWhole(annualGrossValue).toString());
+				setAnnualGross(roundToWhole(annualGrossValue.toNumber()).toString());
 			}
 			if (focusedInput !== "hourlyNet") {
-				setHourlyNet(formatHourlyRate(hourlyNetValue));
+				setHourlyNet(formatHourlyRate(hourlyNetValue.toNumber()));
 			}
 			if (focusedInput !== "monthlyNet") {
-				setMonthlyNet(roundToWhole(monthlyNetValue).toString());
+				setMonthlyNet(roundToWhole(monthlyNetValue.toNumber()).toString());
 			}
 			if (focusedInput !== "annualNet") {
-				setAnnualNet(roundToWhole(annualNetValue).toString());
+				setAnnualNet(roundToWhole(annualNetValue.toNumber()).toString());
 			}
-			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax).toString());
-			setAnnualNetAfterTax(roundToWhole(annualAfterTax).toString());
+			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax.toNumber()).toString());
+			setAnnualNetAfterTax(roundToWhole(annualAfterTax.toNumber()).toString());
 		},
 		[
 			bonusMonths,
@@ -221,10 +228,12 @@ export default function SalaryCalculator() {
 
 	useEffect(() => {
 		if (monthlyNet.trim() !== "" && !Number.isNaN(parseFloat(monthlyNet))) {
-			const monthlyAfterTax = calculateAfterTax(parseFloat(monthlyNet));
-			const annualAfterTax = calculateAfterTax(parseFloat(annualNet));
-			setMonthlyNetAfterTax(monthlyAfterTax.toString());
-			setAnnualNetAfterTax(annualAfterTax.toString());
+			const monthlyNetBig = new BigNumber(monthlyNet);
+			const annualNetBig = new BigNumber(annualNet);
+			const monthlyAfterTax = calculateAfterTax(monthlyNetBig);
+			const annualAfterTax = calculateAfterTax(annualNetBig);
+			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax.toNumber()).toString());
+			setAnnualNetAfterTax(roundToWhole(annualAfterTax.toNumber()).toString());
 		}
 	}, [calculateAfterTax, monthlyNet, annualNet]);
 
@@ -266,14 +275,14 @@ export default function SalaryCalculator() {
 		setAnnualNetAfterTax("0");
 		setFocusedInput(null);
 		setExactValues({
-			hourlyGross: 0,
-			monthlyGross: 0,
-			annualGross: 0,
-			hourlyNet: 0,
-			monthlyNet: 0,
-			annualNet: 0,
-			monthlyNetAfterTax: 0,
-			annualNetAfterTax: 0,
+			hourlyGross: new BigNumber(0),
+			monthlyGross: new BigNumber(0),
+			annualGross: new BigNumber(0),
+			hourlyNet: new BigNumber(0),
+			monthlyNet: new BigNumber(0),
+			annualNet: new BigNumber(0),
+			monthlyNetAfterTax: new BigNumber(0),
+			annualNetAfterTax: new BigNumber(0),
 		});
 	};
 
