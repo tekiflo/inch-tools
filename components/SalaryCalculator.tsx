@@ -202,8 +202,8 @@ export default function SalaryCalculator() {
 			</View>
 
 			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>INDIQUEZ VOTRE SALAIRE BRUT</Text>
-				<Text style={styles.sectionTitle}>RÉSULTAT DE VOTRE SALAIRE NET</Text>
+				<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
+				<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
 			</View>
 
 			<View style={styles.inputRow}>
@@ -315,7 +315,7 @@ export default function SalaryCalculator() {
 			</View>
 
 			<View style={styles.statusSection}>
-				<Text style={styles.sectionTitle}>SÉLECTIONNEZ VOTRE STATUT :</Text>
+				<Text style={styles.sectionTitle}>Sélectionnez votre statut :</Text>
 				<View style={styles.statusOptions}>
 					{statusOptions.map((option) => (
 						<TouchableOpacity
@@ -351,7 +351,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.sliderSection}>
 				<Text style={styles.sectionTitle}>
-					SÉLECTIONNEZ VOTRE TEMPS DE TRAVAIL : {workTimePercentage}%
+					Sélectionnez votre temps de travail : {workTimePercentage}%
 				</Text>
 				<View style={styles.sliderContainer}>
 					<Slider
@@ -372,7 +372,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.bonusSection}>
 				<Text style={styles.sectionTitle}>
-					SÉLECTIONNEZ LE NOMBRE DE MOIS DE PRIME CONVENTIONNELLE:
+					Sélectionnez le nombre de mois de prime conventionnelle:
 				</Text>
 				<View style={styles.bonusOptions}>
 					{bonusMonthOptions.map((months) => (
@@ -409,7 +409,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.deductionSection}>
 				<Text style={styles.sectionTitle}>
-					SÉLECTIONNEZ LE TAUX DE PRÉLÈVEMENT À LA SOURCE:{" "}
+					Sélectionnez le taux de prélèvement à la source:{" "}
 					{sourceDeduction.toFixed(1)}%
 				</Text>
 				<View style={styles.sliderContainer}>
@@ -431,7 +431,7 @@ export default function SalaryCalculator() {
 
 			<View style={styles.resultSection}>
 				<Text style={styles.resultTitle}>
-					ESTIMATION DE VOTRE SALAIRE NET APRÈS LE PRÉLÈVEMENT À LA SOURCE
+					Estimation de votre salaire net après le prélèvement à la source
 				</Text>
 				<View style={styles.resultRow}>
 					<View style={styles.resultGroup}>
@@ -456,7 +456,7 @@ export default function SalaryCalculator() {
 			</View>
 
 			<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
-				<Text style={styles.clearButtonText}>EFFACER LES CHAMPS</Text>
+				<Text style={styles.clearButtonText}>Effacer les champs</Text>
 			</TouchableOpacity>
 		</ScrollView>
 	);
@@ -490,6 +490,7 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		marginBottom: 10,
 		flex: 1,
+		textTransform: "uppercase",
 	},
 	inputRow: {
 		flexDirection: "row",
@@ -621,6 +622,7 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontWeight: "bold",
 		marginBottom: 15,
+		textTransform: "uppercase",
 	},
 	resultRow: {
 		flexDirection: "row",
@@ -654,5 +656,6 @@ const styles = StyleSheet.create({
 		color: "white",
 		fontSize: 14,
 		fontWeight: "bold",
+		textTransform: "uppercase",
 	},
 });
