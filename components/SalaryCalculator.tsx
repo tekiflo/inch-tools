@@ -531,11 +531,14 @@ const styles = StyleSheet.create({
 		backgroundColor: "white",
 		borderRadius: 8,
 		padding: 15,
+		flexDirection: "row",
+		flexWrap: "wrap",
 	},
 	statusOption: {
-		flexDirection: "row",
+		flexDirection: "column",
 		alignItems: "center",
 		marginBottom: 12,
+		flex: 1,
 	},
 	statusOptionSelected: {},
 	radio: {
@@ -546,7 +549,7 @@ const styles = StyleSheet.create({
 		borderColor: "#bdc3c7",
 		alignItems: "center",
 		justifyContent: "center",
-		marginRight: 10,
+		marginBottom: 8,
 	},
 	radioSelected: {
 		borderColor: "#e74c3c",
@@ -559,7 +562,8 @@ const styles = StyleSheet.create({
 	},
 	statusLabel: {
 		color: "#2c3e50",
-		fontSize: 14,
+		fontSize: 12,
+		textAlign: "center",
 	},
 	statusLabelSelected: {
 		color: "#e74c3c",
@@ -591,15 +595,16 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	bonusOption: {
-		flexDirection: "row",
+		flexDirection: "column",
 		alignItems: "center",
 		marginBottom: 10,
-		width: "30%",
+		width: "20%",
 	},
 	bonusOptionSelected: {},
 	bonusLabel: {
 		color: "#2c3e50",
 		fontSize: 12,
+		textAlign: "center",
 	},
 	bonusLabelSelected: {
 		color: "#e74c3c",
