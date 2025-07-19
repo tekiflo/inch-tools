@@ -1,41 +1,41 @@
 # Inch Tools
 
-Une collection d'outils web pratiques pour les calculs et conversions courantes.
+A collection of practical web tools for common calculations and conversions.
 
-## 🛠️ Outils Disponibles
+## 🛠️ Available Tools
 
-- **Calculateur de Salaire Net** : Convertit le salaire brut en net avec les cotisations sociales françaises
+- **Net Salary Calculator**: Converts gross salary to net with French social contributions
 
 ## 🚀 Technologies
 
-- **React Native** avec Expo
-- **TypeScript** pour un typage robuste
-- **Biome** pour le linting et formatage
-- Interface utilisateur en français
+- **React Native** with Expo
+- **TypeScript** for robust typing
+- **Biome** for linting and formatting
+- User interface in French
 
-## 📱 Développement
+## 📱 Development
 
 ```bash
-# Installation des dépendances
+# Install dependencies
 npm install
 
-# Démarrage en mode développement
+# Start development server
 npm start
 
-# Version web
+# Web version
 npm run web
 
-# Linting et formatage
+# Linting and formatting
 npm run check
 ```
 
 ## 🤖 Claude Code Showcase
 
-Ce projet a été développé en collaboration avec **Claude Code**, démontrant les capacités d'assistance au développement avec IA. 
+This project was developed in collaboration with **Claude Code**, demonstrating AI-assisted development capabilities. 
 
-### Configuration Claude utilisée
+### Claude Configuration Used
 
-Le développement suit ces principes configurés dans `~/.claude/CLAUDE.md` :
+Development follows these principles configured in `~/.claude/CLAUDE.md`:
 
 ```markdown
 # Claude Agent Configuration
@@ -52,12 +52,13 @@ Le développement suit ces principes configurés dans `~/.claude/CLAUDE.md` :
 ## Code Style
 - Avoid comments unless the code is extremely complex
 
-## MCP Servers
-- **context7**: Documentation et exemples de code pour les bibliothèques
-- **code-reasoning**: Raisonnement structuré et résolution de problèmes
-- **ide**: Intégration IDE avec diagnostics et exécution de code
 ```
+
+## MCP Servers
+- **context7**: Documentation and code examples for libraries
+- **code-reasoning**: Structured reasoning and problem solving
+- **ide**: IDE integration with diagnostics and code execution
 
 ---
 
-*Développé avec Claude Code - Intelligence artificielle au service du développement*
+*Developed with Claude Code - AI-powered development assistance*
