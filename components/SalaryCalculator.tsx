@@ -23,6 +23,17 @@ const StatusEnum = z.enum([
 
 type Status = z.infer<typeof StatusEnum>;
 
+type Salary = {
+	hourlyGross: BigNumber;
+	monthlyGross: BigNumber;
+	annualGross: BigNumber;
+	hourlyNet: BigNumber;
+	monthlyNet: BigNumber;
+	annualNet: BigNumber;
+	monthlyNetAfterTax: BigNumber;
+	annualNetAfterTax: BigNumber;
+};
+
 const deductionRates: Record<Status, number> = {
 	"non-cadre": 0.22,
 	cadre: 0.25,
@@ -81,8 +92,8 @@ export default function SalaryCalculator() {
 		sourceDeduction,
 	});
 
-	// Internal exact values for precise calculations using BigNumber
-	const [exactValues, setExactValues] = useState({
+	// Internal salary values for precise calculations using BigNumber
+	const [salary, setSalary] = useState<Salary>({
 		hourlyGross: new BigNumber(0),
 		monthlyGross: new BigNumber(0),
 		annualGross: new BigNumber(0),
@@ -93,43 +104,43 @@ export default function SalaryCalculator() {
 		annualNetAfterTax: new BigNumber(0),
 	});
 
-	// Computed display values from exact values (or raw input when focused)
+	// Computed display values from salary values (or raw input when focused)
 	const hourlyGross =
 		focusedInput === "hourlyGross"
 			? inputValues.hourlyGross || ""
-			: exactValues.hourlyGross.isZero()
+			: salary.hourlyGross.isZero()
 				? ""
-				: formatHourlyRate(exactValues.hourlyGross.toNumber());
+				: formatHourlyRate(salary.hourlyGross.toNumber());
 	const monthlyGross =
 		focusedInput === "monthlyGross"
 			? inputValues.monthlyGross || ""
-			: exactValues.monthlyGross.isZero()
+			: salary.monthlyGross.isZero()
 				? ""
-				: roundToWhole(exactValues.monthlyGross.toNumber()).toString();
+				: roundToWhole(salary.monthlyGross.toNumber()).toString();
 	const annualGross =
 		focusedInput === "annualGross"
 			? inputValues.annualGross || ""
-			: exactValues.annualGross.isZero()
+			: salary.annualGross.isZero()
 				? ""
-				: roundToWhole(exactValues.annualGross.toNumber()).toString();
+				: roundToWhole(salary.annualGross.toNumber()).toString();
 	const hourlyNet =
 		focusedInput === "hourlyNet"
 			? inputValues.hourlyNet || ""
-			: exactValues.hourlyNet.isZero()
+			: salary.hourlyNet.isZero()
 				? ""
-				: formatHourlyRate(exactValues.hourlyNet.toNumber());
+				: formatHourlyRate(salary.hourlyNet.toNumber());
 	const monthlyNet =
 		focusedInput === "monthlyNet"
 			? inputValues.monthlyNet || ""
-			: exactValues.monthlyNet.isZero()
+			: salary.monthlyNet.isZero()
 				? ""
-				: roundToWhole(exactValues.monthlyNet.toNumber()).toString();
+				: roundToWhole(salary.monthlyNet.toNumber()).toString();
 	const annualNet =
 		focusedInput === "annualNet"
 			? inputValues.annualNet || ""
-			: exactValues.annualNet.isZero()
+			: salary.annualNet.isZero()
 				? ""
-				: roundToWhole(exactValues.annualNet.toNumber()).toString();
+				: roundToWhole(salary.annualNet.toNumber()).toString();
 
 	const getDeductionRate = useCallback((status: Status): number => {
 		return deductionRates[status];
@@ -257,47 +268,44 @@ export default function SalaryCalculator() {
 
 			// Only recalculate if we have some values to work with
 			if (
-				!exactValues.hourlyGross.isZero() ||
-				!exactValues.monthlyGross.isZero() ||
-				!exactValues.annualGross.isZero() ||
-				!exactValues.hourlyNet.isZero() ||
-				!exactValues.monthlyNet.isZero() ||
-				!exactValues.annualNet.isZero()
+				!salary.hourlyGross.isZero() ||
+				!salary.monthlyGross.isZero() ||
+				!salary.annualGross.isZero() ||
+				!salary.hourlyNet.isZero() ||
+				!salary.monthlyNet.isZero() ||
+				!salary.annualNet.isZero()
 			) {
 				// Find the first non-zero value to use as source, prioritizing monthly gross
 				let source: string;
 				let value: string;
 
-				if (!exactValues.monthlyGross.isZero()) {
+				if (!salary.monthlyGross.isZero()) {
 					source = "monthlyGross";
-					value = exactValues.monthlyGross.toString();
-				} else if (!exactValues.hourlyGross.isZero()) {
+					value = salary.monthlyGross.toString();
+				} else if (!salary.hourlyGross.isZero()) {
 					source = "hourlyGross";
-					value = exactValues.hourlyGross.toString();
-				} else if (!exactValues.annualGross.isZero()) {
+					value = salary.hourlyGross.toString();
+				} else if (!salary.annualGross.isZero()) {
 					source = "annualGross";
-					value = exactValues.annualGross.toString();
-				} else if (!exactValues.monthlyNet.isZero()) {
+					value = salary.annualGross.toString();
+				} else if (!salary.monthlyNet.isZero()) {
 					source = "monthlyNet";
-					value = exactValues.monthlyNet.toString();
-				} else if (!exactValues.hourlyNet.isZero()) {
+					value = salary.monthlyNet.toString();
+				} else if (!salary.hourlyNet.isZero()) {
 					source = "hourlyNet";
-					value = exactValues.hourlyNet.toString();
-				} else if (!exactValues.annualNet.isZero()) {
+					value = salary.hourlyNet.toString();
+				} else if (!salary.annualNet.isZero()) {
 					source = "annualNet";
-					value = exactValues.annualNet.toString();
+					value = salary.annualNet.toString();
 				} else {
 					return;
 				}
 
 				updateAllFields(
-					source as
-						| "hourlyGross"
-						| "monthlyGross"
-						| "annualGross"
-						| "hourlyNet"
-						| "monthlyNet"
-						| "annualNet",
+					source as keyof Omit<
+						Salary,
+						"monthlyNetAfterTax" | "annualNetAfterTax"
+					>,
 					value,
 				);
 			}
@@ -308,7 +316,6 @@ export default function SalaryCalculator() {
 		bonusMonths,
 		sourceDeduction,
 		updateAllFields,
-		exactValues,
 	]);
 
 	const statusOptions: Array<{ label: string; value: Status }> = [
@@ -329,29 +336,29 @@ export default function SalaryCalculator() {
 		const currentValue = (() => {
 			switch (fieldName) {
 				case "hourlyGross":
-					return exactValues.hourlyGross.isZero()
+					return salary.hourlyGross.isZero()
 						? ""
-						: formatHourlyRate(exactValues.hourlyGross.toNumber());
+						: formatHourlyRate(salary.hourlyGross.toNumber());
 				case "monthlyGross":
-					return exactValues.monthlyGross.isZero()
+					return salary.monthlyGross.isZero()
 						? ""
-						: roundToWhole(exactValues.monthlyGross.toNumber()).toString();
+						: roundToWhole(salary.monthlyGross.toNumber()).toString();
 				case "annualGross":
-					return exactValues.annualGross.isZero()
+					return salary.annualGross.isZero()
 						? ""
-						: roundToWhole(exactValues.annualGross.toNumber()).toString();
+						: roundToWhole(salary.annualGross.toNumber()).toString();
 				case "hourlyNet":
-					return exactValues.hourlyNet.isZero()
+					return salary.hourlyNet.isZero()
 						? ""
-						: formatHourlyRate(exactValues.hourlyNet.toNumber());
+						: formatHourlyRate(salary.hourlyNet.toNumber());
 				case "monthlyNet":
-					return exactValues.monthlyNet.isZero()
+					return salary.monthlyNet.isZero()
 						? ""
-						: roundToWhole(exactValues.monthlyNet.toNumber()).toString();
+						: roundToWhole(salary.monthlyNet.toNumber()).toString();
 				case "annualNet":
-					return exactValues.annualNet.isZero()
+					return salary.annualNet.isZero()
 						? ""
-						: roundToWhole(exactValues.annualNet.toNumber()).toString();
+						: roundToWhole(salary.annualNet.toNumber()).toString();
 				default:
 					return "";
 			}
@@ -364,11 +371,14 @@ export default function SalaryCalculator() {
 		setInputValues({});
 	};
 
-	const handleHourlyBlur = (fieldName: string, value: string) => {
+	const handleHourlyBlur = (
+		fieldName: "hourlyGross" | "hourlyNet",
+		value: string,
+	) => {
 		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 			// Format the value and trigger calculation
 			const formattedValue = formatHourlyRate(parseFloat(value));
-			updateAllFields(fieldName as "hourlyGross" | "hourlyNet", formattedValue);
+			updateAllFields(fieldName, formattedValue);
 		}
 		setFocusedInput(null);
 		setInputValues({});
@@ -378,13 +388,10 @@ export default function SalaryCalculator() {
 		setInputValues((prev) => ({ ...prev, [fieldName]: value }));
 		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
 			updateAllFields(
-				fieldName as
-					| "hourlyGross"
-					| "monthlyGross"
-					| "annualGross"
-					| "hourlyNet"
-					| "monthlyNet"
-					| "annualNet",
+				fieldName as keyof Omit<
+					Salary,
+					"monthlyNetAfterTax" | "annualNetAfterTax"
+				>,
 				value,
 			);
 		}
@@ -395,7 +402,7 @@ export default function SalaryCalculator() {
 		setAnnualNetAfterTax("0");
 		setFocusedInput(null);
 		setInputValues({});
-		setExactValues({
+		setSalary({
 			hourlyGross: new BigNumber(0),
 			monthlyGross: new BigNumber(0),
 			annualGross: new BigNumber(0),
