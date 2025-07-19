@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "simple-expo-app",
-		"slug": "simple-expo-app",
+		"name": "inch-tools",
+		"slug": "inch-tools",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
