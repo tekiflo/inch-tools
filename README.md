@@ -57,7 +57,6 @@ Development follows these principles configured in `~/.claude/CLAUDE.md`:
 ## MCP Servers
 - **context7**: Documentation and code examples for libraries
 - **code-reasoning**: Structured reasoning and problem solving
-- **ide**: IDE integration with diagnostics and code execution
 
 ---
 
