@@ -35,23 +35,29 @@ This project was developed in collaboration with **Claude Code**, demonstrating 
 
 ### Claude Configuration Used
 
-Development follows these principles configured in `~/.claude/CLAUDE.md`:
+Development follows strict principles configured in `~/.claude/CLAUDE.md`:
 
 ```markdown
 # Claude Agent Configuration
 
-## Important Instructions
-- **SHOULD**: Use TypeScript over JavaScript whenever possible.
-- **MUST**: Correct me if I'm wrong.
-- **MUST**: If code has been written, commit after each prompt completion using conventional commits format (no description, only one-line title)
-- Never use null values unless I explicitly say so or if it's absolutely needed
+## Code Requirements
+- **MUST**: Use TypeScript exclusively - never JavaScript
+- **MUST**: Provide full type annotations and interfaces for all code
+- **MUST**: Correct me if I'm wrong about technical details
+- **MUST**: Commit after each prompt completion using conventional commit format (title only, no description)
+- **NEVER**: Use null values unless explicitly requested or absolutely necessary
+- **NEVER**: Write comments unless code is extremely complex or business logic requires explanation
 
-## Context Usage
-- Use context7 for specific tasks and reference
+## Documentation and Research
+- **ALWAYS**: Use context7 MCP server for library documentation and code examples before writing code
+- **MUST**: Reference official documentation through context7 rather than making assumptions about APIs
+- **SHOULD**: Verify library usage patterns and best practices through context7 before implementation
 
-## Code Style
-- Avoid comments unless the code is extremely complex
-
+## Code Standards
+- Prefer explicit typing over type inference where it improves readability
+- Use strict TypeScript configuration
+- Implement proper error handling with typed exceptions
+- Follow functional programming patterns where appropriate
 ```
 
 ## MCP Servers
