@@ -546,8 +546,7 @@ export default function SalaryCalculator() {
 						<TextInput
 							style={styles.resultInput}
 							value={monthlyNetAfterTax}
-							onChangeText={setMonthlyNetAfterTax}
-							keyboardType="numeric"
+							editable={false}
 						/>
 					</View>
 					<View style={styles.resultGroup}>
@@ -555,8 +554,7 @@ export default function SalaryCalculator() {
 						<TextInput
 							style={styles.resultInput}
 							value={annualNetAfterTax}
-							onChangeText={setAnnualNetAfterTax}
-							keyboardType="numeric"
+							editable={false}
 						/>
 					</View>
 				</View>
