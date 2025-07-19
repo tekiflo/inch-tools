@@ -213,15 +213,15 @@ export default function SalaryCalculator() {
 
 	const handleInputFocus = (fieldName: string) => {
 		setFocusedInput(fieldName);
-		// Store current computed value as input value when focusing
+		// Store currently displayed formatted value as input value when focusing
 		const currentValue = (() => {
 			switch(fieldName) {
-				case "hourlyGross": return exactValues.hourlyGross.isZero() ? "" : exactValues.hourlyGross.toString();
-				case "monthlyGross": return exactValues.monthlyGross.isZero() ? "" : exactValues.monthlyGross.toString();
-				case "annualGross": return exactValues.annualGross.isZero() ? "" : exactValues.annualGross.toString();
-				case "hourlyNet": return exactValues.hourlyNet.isZero() ? "" : exactValues.hourlyNet.toString();
-				case "monthlyNet": return exactValues.monthlyNet.isZero() ? "" : exactValues.monthlyNet.toString();
-				case "annualNet": return exactValues.annualNet.isZero() ? "" : exactValues.annualNet.toString();
+				case "hourlyGross": return exactValues.hourlyGross.isZero() ? "" : formatHourlyRate(exactValues.hourlyGross.toNumber());
+				case "monthlyGross": return exactValues.monthlyGross.isZero() ? "" : roundToWhole(exactValues.monthlyGross.toNumber()).toString();
+				case "annualGross": return exactValues.annualGross.isZero() ? "" : roundToWhole(exactValues.annualGross.toNumber()).toString();
+				case "hourlyNet": return exactValues.hourlyNet.isZero() ? "" : formatHourlyRate(exactValues.hourlyNet.toNumber());
+				case "monthlyNet": return exactValues.monthlyNet.isZero() ? "" : roundToWhole(exactValues.monthlyNet.toNumber()).toString();
+				case "annualNet": return exactValues.annualNet.isZero() ? "" : roundToWhole(exactValues.annualNet.toNumber()).toString();
 				default: return "";
 			}
 		})();
