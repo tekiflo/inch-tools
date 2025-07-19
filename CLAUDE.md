@@ -14,3 +14,7 @@ This application is a collection of useful web tools that are commonly searched 
 - Collection of web-based tools and utilities
 - Focus on commonly needed functionality
 - User-friendly interface in French
+
+## Repository Information
+- Repository is available on GitHub at git@github.com:tekiflo/inch-tools.git
+- Use gh CLI to interact with GitHub
