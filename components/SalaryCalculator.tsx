@@ -1,4 +1,5 @@
 import Slider from "@react-native-community/slider";
+import BigNumber from "bignumber.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	Platform,
@@ -11,7 +12,6 @@ import {
 	View,
 } from "react-native";
 import { z } from "zod";
-import BigNumber from "bignumber.js";
 
 const StatusEnum = z.enum([
 	"non-cadre",
@@ -63,7 +63,7 @@ const formatHourlyRate = (value: number): string => {
 
 export default function SalaryCalculator() {
 	const statusBarHeight = StatusBar.currentHeight || 0;
-	const isIOS = Platform.OS === 'ios';
+	const isIOS = Platform.OS === "ios";
 	const [status, setStatus] = useState<Status>("non-cadre");
 	const [workTimePercentage, setWorkTimePercentage] = useState(100);
 	const [bonusMonths, setBonusMonths] = useState(12);
@@ -72,10 +72,15 @@ export default function SalaryCalculator() {
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 	const [focusedInput, setFocusedInput] = useState<string | null>(null);
 	const [inputValues, setInputValues] = useState<Record<string, string>>({});
-	
+
 	// Track previous dependency values to avoid infinite loops
-	const prevDepsRef = useRef({ status, workTimePercentage, bonusMonths, sourceDeduction });
-	
+	const prevDepsRef = useRef({
+		status,
+		workTimePercentage,
+		bonusMonths,
+		sourceDeduction,
+	});
+
 	// Internal exact values for precise calculations using BigNumber
 	const [exactValues, setExactValues] = useState({
 		hourlyGross: new BigNumber(0),
@@ -89,18 +94,42 @@ export default function SalaryCalculator() {
 	});
 
 	// Computed display values from exact values (or raw input when focused)
-	const hourlyGross = focusedInput === "hourlyGross" ? (inputValues.hourlyGross || "") : 
-		(exactValues.hourlyGross.isZero() ? "" : formatHourlyRate(exactValues.hourlyGross.toNumber()));
-	const monthlyGross = focusedInput === "monthlyGross" ? (inputValues.monthlyGross || "") :
-		(exactValues.monthlyGross.isZero() ? "" : roundToWhole(exactValues.monthlyGross.toNumber()).toString());
-	const annualGross = focusedInput === "annualGross" ? (inputValues.annualGross || "") :
-		(exactValues.annualGross.isZero() ? "" : roundToWhole(exactValues.annualGross.toNumber()).toString());
-	const hourlyNet = focusedInput === "hourlyNet" ? (inputValues.hourlyNet || "") :
-		(exactValues.hourlyNet.isZero() ? "" : formatHourlyRate(exactValues.hourlyNet.toNumber()));
-	const monthlyNet = focusedInput === "monthlyNet" ? (inputValues.monthlyNet || "") :
-		(exactValues.monthlyNet.isZero() ? "" : roundToWhole(exactValues.monthlyNet.toNumber()).toString());
-	const annualNet = focusedInput === "annualNet" ? (inputValues.annualNet || "") :
-		(exactValues.annualNet.isZero() ? "" : roundToWhole(exactValues.annualNet.toNumber()).toString());
+	const hourlyGross =
+		focusedInput === "hourlyGross"
+			? inputValues.hourlyGross || ""
+			: exactValues.hourlyGross.isZero()
+				? ""
+				: formatHourlyRate(exactValues.hourlyGross.toNumber());
+	const monthlyGross =
+		focusedInput === "monthlyGross"
+			? inputValues.monthlyGross || ""
+			: exactValues.monthlyGross.isZero()
+				? ""
+				: roundToWhole(exactValues.monthlyGross.toNumber()).toString();
+	const annualGross =
+		focusedInput === "annualGross"
+			? inputValues.annualGross || ""
+			: exactValues.annualGross.isZero()
+				? ""
+				: roundToWhole(exactValues.annualGross.toNumber()).toString();
+	const hourlyNet =
+		focusedInput === "hourlyNet"
+			? inputValues.hourlyNet || ""
+			: exactValues.hourlyNet.isZero()
+				? ""
+				: formatHourlyRate(exactValues.hourlyNet.toNumber());
+	const monthlyNet =
+		focusedInput === "monthlyNet"
+			? inputValues.monthlyNet || ""
+			: exactValues.monthlyNet.isZero()
+				? ""
+				: roundToWhole(exactValues.monthlyNet.toNumber()).toString();
+	const annualNet =
+		focusedInput === "annualNet"
+			? inputValues.annualNet || ""
+			: exactValues.annualNet.isZero()
+				? ""
+				: roundToWhole(exactValues.annualNet.toNumber()).toString();
 
 	const getDeductionRate = useCallback((status: Status): number => {
 		return deductionRates[status];
@@ -111,7 +140,9 @@ export default function SalaryCalculator() {
 			const deductionRate = new BigNumber(getDeductionRate(status));
 			const workTimeFactor = new BigNumber(workTimePercentage).dividedBy(100);
 			const oneMinusDeduction = new BigNumber(1).minus(deductionRate);
-			return grossAmount.multipliedBy(oneMinusDeduction).multipliedBy(workTimeFactor);
+			return grossAmount
+				.multipliedBy(oneMinusDeduction)
+				.multipliedBy(workTimeFactor);
 		},
 		[getDeductionRate, status, workTimePercentage],
 	);
@@ -190,7 +221,9 @@ export default function SalaryCalculator() {
 			});
 
 			// Update after-tax display values
-			setMonthlyNetAfterTax(roundToWhole(monthlyAfterTax.toNumber()).toString());
+			setMonthlyNetAfterTax(
+				roundToWhole(monthlyAfterTax.toNumber()).toString(),
+			);
 			setAnnualNetAfterTax(roundToWhole(annualAfterTax.toNumber()).toString());
 		},
 		[
@@ -203,26 +236,38 @@ export default function SalaryCalculator() {
 
 	// Recalculate when dependencies change (status, workTimePercentage, bonusMonths, sourceDeduction)
 	useEffect(() => {
-		const currentDeps = { status, workTimePercentage, bonusMonths, sourceDeduction };
+		const currentDeps = {
+			status,
+			workTimePercentage,
+			bonusMonths,
+			sourceDeduction,
+		};
 		const prevDeps = prevDepsRef.current;
-		
+
 		// Check if dependencies actually changed
-		const depsChanged = Object.keys(currentDeps).some((key) => 
-			currentDeps[key as keyof typeof currentDeps] !== prevDeps[key as keyof typeof prevDeps]
+		const depsChanged = Object.keys(currentDeps).some(
+			(key) =>
+				currentDeps[key as keyof typeof currentDeps] !==
+				prevDeps[key as keyof typeof prevDeps],
 		);
-		
+
 		if (depsChanged) {
 			// Update the ref with current values
 			prevDepsRef.current = currentDeps;
-			
+
 			// Only recalculate if we have some values to work with
-			if (!exactValues.hourlyGross.isZero() || !exactValues.monthlyGross.isZero() || !exactValues.annualGross.isZero() ||
-				!exactValues.hourlyNet.isZero() || !exactValues.monthlyNet.isZero() || !exactValues.annualNet.isZero()) {
-				
+			if (
+				!exactValues.hourlyGross.isZero() ||
+				!exactValues.monthlyGross.isZero() ||
+				!exactValues.annualGross.isZero() ||
+				!exactValues.hourlyNet.isZero() ||
+				!exactValues.monthlyNet.isZero() ||
+				!exactValues.annualNet.isZero()
+			) {
 				// Find the first non-zero value to use as source, prioritizing monthly gross
 				let source: string;
 				let value: string;
-				
+
 				if (!exactValues.monthlyGross.isZero()) {
 					source = "monthlyGross";
 					value = exactValues.monthlyGross.toString();
@@ -244,11 +289,27 @@ export default function SalaryCalculator() {
 				} else {
 					return;
 				}
-				
-				updateAllFields(source as "hourlyGross" | "monthlyGross" | "annualGross" | "hourlyNet" | "monthlyNet" | "annualNet", value);
+
+				updateAllFields(
+					source as
+						| "hourlyGross"
+						| "monthlyGross"
+						| "annualGross"
+						| "hourlyNet"
+						| "monthlyNet"
+						| "annualNet",
+					value,
+				);
 			}
 		}
-	}, [status, workTimePercentage, bonusMonths, sourceDeduction, updateAllFields, exactValues]);
+	}, [
+		status,
+		workTimePercentage,
+		bonusMonths,
+		sourceDeduction,
+		updateAllFields,
+		exactValues,
+	]);
 
 	const statusOptions: Array<{ label: string; value: Status }> = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
@@ -266,17 +327,36 @@ export default function SalaryCalculator() {
 		setFocusedInput(fieldName);
 		// Store currently displayed formatted value as input value when focusing
 		const currentValue = (() => {
-			switch(fieldName) {
-				case "hourlyGross": return exactValues.hourlyGross.isZero() ? "" : formatHourlyRate(exactValues.hourlyGross.toNumber());
-				case "monthlyGross": return exactValues.monthlyGross.isZero() ? "" : roundToWhole(exactValues.monthlyGross.toNumber()).toString();
-				case "annualGross": return exactValues.annualGross.isZero() ? "" : roundToWhole(exactValues.annualGross.toNumber()).toString();
-				case "hourlyNet": return exactValues.hourlyNet.isZero() ? "" : formatHourlyRate(exactValues.hourlyNet.toNumber());
-				case "monthlyNet": return exactValues.monthlyNet.isZero() ? "" : roundToWhole(exactValues.monthlyNet.toNumber()).toString();
-				case "annualNet": return exactValues.annualNet.isZero() ? "" : roundToWhole(exactValues.annualNet.toNumber()).toString();
-				default: return "";
+			switch (fieldName) {
+				case "hourlyGross":
+					return exactValues.hourlyGross.isZero()
+						? ""
+						: formatHourlyRate(exactValues.hourlyGross.toNumber());
+				case "monthlyGross":
+					return exactValues.monthlyGross.isZero()
+						? ""
+						: roundToWhole(exactValues.monthlyGross.toNumber()).toString();
+				case "annualGross":
+					return exactValues.annualGross.isZero()
+						? ""
+						: roundToWhole(exactValues.annualGross.toNumber()).toString();
+				case "hourlyNet":
+					return exactValues.hourlyNet.isZero()
+						? ""
+						: formatHourlyRate(exactValues.hourlyNet.toNumber());
+				case "monthlyNet":
+					return exactValues.monthlyNet.isZero()
+						? ""
+						: roundToWhole(exactValues.monthlyNet.toNumber()).toString();
+				case "annualNet":
+					return exactValues.annualNet.isZero()
+						? ""
+						: roundToWhole(exactValues.annualNet.toNumber()).toString();
+				default:
+					return "";
 			}
 		})();
-		setInputValues(prev => ({ ...prev, [fieldName]: currentValue }));
+		setInputValues((prev) => ({ ...prev, [fieldName]: currentValue }));
 	};
 
 	const handleInputBlur = () => {
@@ -295,9 +375,18 @@ export default function SalaryCalculator() {
 	};
 
 	const handleInputChange = (fieldName: string, value: string) => {
-		setInputValues(prev => ({ ...prev, [fieldName]: value }));
+		setInputValues((prev) => ({ ...prev, [fieldName]: value }));
 		if (value.trim() !== "" && !Number.isNaN(parseFloat(value))) {
-			updateAllFields(fieldName as "hourlyGross" | "monthlyGross" | "annualGross" | "hourlyNet" | "monthlyNet" | "annualNet", value);
+			updateAllFields(
+				fieldName as
+					| "hourlyGross"
+					| "monthlyGross"
+					| "annualGross"
+					| "hourlyNet"
+					| "monthlyNet"
+					| "annualNet",
+				value,
+			);
 		}
 	};
 
@@ -321,248 +410,259 @@ export default function SalaryCalculator() {
 	return (
 		<View style={styles.safeArea}>
 			<StatusBar backgroundColor="#e74c3c" barStyle="light-content" />
-			<ScrollView style={[styles.container, { paddingTop: isIOS ? 44 : statusBarHeight + 20 }]}>
-			<View style={styles.header}>
-				<Text style={styles.title}>Calcul Du Salaire Brut En Net</Text>
-			</View>
+			<ScrollView
+				style={[
+					styles.container,
+					{ paddingTop: isIOS ? 44 : statusBarHeight + 20 },
+				]}
+			>
+				<View style={styles.header}>
+					<Text style={styles.title}>Salaire Brut En Net</Text>
+				</View>
 
-			<View style={styles.section}>
-				<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
-				<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
-			</View>
+				<View style={styles.section}>
+					<Text style={styles.sectionTitle}>Indiquez votre salaire brut</Text>
+					<Text style={styles.sectionTitle}>Résultat de votre salaire net</Text>
+				</View>
 
-			<View style={styles.inputRow}>
-				<View style={styles.inputGroup}>
-					<Text style={styles.labelText}>Horaire brut</Text>
-					<TextInput
-						style={styles.input}
-						value={hourlyGross}
-						onChangeText={(value) => handleInputChange("hourlyGross", value)}
-						onFocus={() => handleInputFocus("hourlyGross")}
-						onBlur={() => handleHourlyBlur("hourlyGross", inputValues.hourlyGross || "")}
-						keyboardType="numeric"
-						placeholder="ex : 9.88"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-				<View style={styles.inputGroup}>
-					<Text style={styles.labelText}>Horaire net</Text>
-					<TextInput
-						style={styles.input}
-						value={hourlyNet}
-						onChangeText={(value) => handleInputChange("hourlyNet", value)}
-						onFocus={() => handleInputFocus("hourlyNet")}
-						onBlur={() => handleHourlyBlur("hourlyNet", inputValues.hourlyNet || "")}
-						keyboardType="numeric"
-						placeholder="Horaire"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-			</View>
-
-			<View style={styles.inputRow}>
-				<View style={styles.inputGroup}>
-					<View style={styles.label}>
-						<Text style={styles.labelText}>Mensuel brut</Text>
-						<Text style={styles.badgeText}>{statusTooltips[status]}</Text>
-					</View>
-					<TextInput
-						style={styles.input}
-						value={monthlyGross}
-						onChangeText={(value) => handleInputChange("monthlyGross", value)}
-						onFocus={() => handleInputFocus("monthlyGross")}
-						onBlur={handleInputBlur}
-						keyboardType="numeric"
-						placeholder="ex : 1498"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-				<View style={styles.inputGroup}>
-					<Text style={styles.labelText}>Mensuel net</Text>
-					<TextInput
-						style={styles.input}
-						value={monthlyNet}
-						onChangeText={(value) => handleInputChange("monthlyNet", value)}
-						onFocus={() => handleInputFocus("monthlyNet")}
-						onBlur={handleInputBlur}
-						keyboardType="numeric"
-						placeholder="Mensuel"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-			</View>
-
-			<View style={styles.inputRow}>
-				<View style={styles.inputGroup}>
-					<Text style={styles.labelText}>Annuel brut</Text>
-					<TextInput
-						style={styles.input}
-						value={annualGross}
-						onChangeText={(value) => handleInputChange("annualGross", value)}
-						onFocus={() => handleInputFocus("annualGross")}
-						onBlur={handleInputBlur}
-						keyboardType="numeric"
-						placeholder="ex : 17976"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-				<View style={styles.inputGroup}>
-					<Text style={styles.labelText}>Annuel net</Text>
-					<TextInput
-						style={styles.input}
-						value={annualNet}
-						onChangeText={(value) => handleInputChange("annualNet", value)}
-						onFocus={() => handleInputFocus("annualNet")}
-						onBlur={handleInputBlur}
-						keyboardType="numeric"
-						placeholder="Annuel"
-						placeholderTextColor="#e74c3c"
-					/>
-				</View>
-			</View>
-
-			<View style={styles.statusSection}>
-				<Text style={styles.sectionTitle}>Sélectionnez votre statut :</Text>
-				<View style={styles.statusOptions}>
-					{statusOptions.map((option) => (
-						<TouchableOpacity
-							key={option.value}
-							style={[
-								styles.statusOption,
-								status === option.value && styles.statusOptionSelected,
-							]}
-							onPress={() => {
-								setStatus(option.value);
-							}}
-						>
-							<View
-								style={[
-									styles.radio,
-									status === option.value && styles.radioSelected,
-								]}
-							>
-								{status === option.value && <View style={styles.radioInner} />}
-							</View>
-							<Text
-								style={[
-									styles.statusLabel,
-									status === option.value && styles.statusLabelSelected,
-								]}
-							>
-								{option.label}
-							</Text>
-						</TouchableOpacity>
-					))}
-				</View>
-			</View>
-
-			<View style={styles.sliderSection}>
-				<Text style={styles.sectionTitle}>
-					Sélectionnez votre temps de travail : {workTimePercentage}%
-				</Text>
-				<View style={styles.sliderContainer}>
-					<Slider
-						style={styles.slider}
-						minimumValue={10}
-						maximumValue={100}
-						value={workTimePercentage}
-						onValueChange={(value) => {
-							setWorkTimePercentage(value);
-						}}
-						step={10}
-						minimumTrackTintColor="#e74c3c"
-						maximumTrackTintColor="#e0e0e0"
-						thumbTintColor="#e74c3c"
-					/>
-				</View>
-			</View>
-
-			<View style={styles.bonusSection}>
-				<Text style={styles.sectionTitle}>
-					Sélectionnez le nombre de mois de prime conventionnelle:
-				</Text>
-				<View style={styles.bonusOptions}>
-					{bonusMonthOptions.map((months) => (
-						<TouchableOpacity
-							key={months}
-							style={[
-								styles.bonusOption,
-								bonusMonths === months && styles.bonusOptionSelected,
-							]}
-							onPress={() => {
-								setBonusMonths(months);
-							}}
-						>
-							<View
-								style={[
-									styles.radio,
-									bonusMonths === months && styles.radioSelected,
-								]}
-							>
-								{bonusMonths === months && <View style={styles.radioInner} />}
-							</View>
-							<Text
-								style={[
-									styles.bonusLabel,
-									bonusMonths === months && styles.bonusLabelSelected,
-								]}
-							>
-								{months} mois
-							</Text>
-						</TouchableOpacity>
-					))}
-				</View>
-			</View>
-
-			<View style={styles.deductionSection}>
-				<Text style={styles.sectionTitle}>
-					Sélectionnez le taux de prélèvement à la source:{" "}
-					{sourceDeduction.toFixed(1)}%
-				</Text>
-				<View style={styles.sliderContainer}>
-					<Slider
-						style={styles.slider}
-						minimumValue={0}
-						maximumValue={100}
-						value={sourceDeduction}
-						onValueChange={(value) => {
-							setSourceDeduction(value);
-						}}
-						step={0.5}
-						minimumTrackTintColor="#e74c3c"
-						maximumTrackTintColor="#e0e0e0"
-						thumbTintColor="#e74c3c"
-					/>
-				</View>
-			</View>
-
-			<View style={styles.resultSection}>
-				<Text style={styles.resultTitle}>
-					Estimation de votre salaire net après le prélèvement à la source
-				</Text>
-				<View style={styles.resultRow}>
-					<View style={styles.resultGroup}>
-						<Text style={styles.resultLabel}>Mensuel net après impôts</Text>
+				<View style={styles.inputRow}>
+					<View style={styles.inputGroup}>
+						<Text style={styles.labelText}>Horaire brut</Text>
 						<TextInput
-							style={styles.resultInput}
-							value={monthlyNetAfterTax}
-							editable={false}
+							style={styles.input}
+							value={hourlyGross}
+							onChangeText={(value) => handleInputChange("hourlyGross", value)}
+							onFocus={() => handleInputFocus("hourlyGross")}
+							onBlur={() =>
+								handleHourlyBlur("hourlyGross", inputValues.hourlyGross || "")
+							}
+							keyboardType="numeric"
+							placeholder="ex : 9.88"
+							placeholderTextColor="#e74c3c"
 						/>
 					</View>
-					<View style={styles.resultGroup}>
-						<Text style={styles.resultLabel}>Annuel net après impôts</Text>
+					<View style={styles.inputGroup}>
+						<Text style={styles.labelText}>Horaire net</Text>
 						<TextInput
-							style={styles.resultInput}
-							value={annualNetAfterTax}
-							editable={false}
+							style={styles.input}
+							value={hourlyNet}
+							onChangeText={(value) => handleInputChange("hourlyNet", value)}
+							onFocus={() => handleInputFocus("hourlyNet")}
+							onBlur={() =>
+								handleHourlyBlur("hourlyNet", inputValues.hourlyNet || "")
+							}
+							keyboardType="numeric"
+							placeholder="Horaire"
+							placeholderTextColor="#e74c3c"
 						/>
 					</View>
 				</View>
-			</View>
 
-			<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
-				<Text style={styles.clearButtonText}>Effacer les champs</Text>
-			</TouchableOpacity>
+				<View style={styles.inputRow}>
+					<View style={styles.inputGroup}>
+						<View style={styles.label}>
+							<Text style={styles.labelText}>Mensuel brut</Text>
+							<Text style={styles.badgeText}>{statusTooltips[status]}</Text>
+						</View>
+						<TextInput
+							style={styles.input}
+							value={monthlyGross}
+							onChangeText={(value) => handleInputChange("monthlyGross", value)}
+							onFocus={() => handleInputFocus("monthlyGross")}
+							onBlur={handleInputBlur}
+							keyboardType="numeric"
+							placeholder="ex : 1498"
+							placeholderTextColor="#e74c3c"
+						/>
+					</View>
+					<View style={styles.inputGroup}>
+						<Text style={styles.labelText}>Mensuel net</Text>
+						<TextInput
+							style={styles.input}
+							value={monthlyNet}
+							onChangeText={(value) => handleInputChange("monthlyNet", value)}
+							onFocus={() => handleInputFocus("monthlyNet")}
+							onBlur={handleInputBlur}
+							keyboardType="numeric"
+							placeholder="Mensuel"
+							placeholderTextColor="#e74c3c"
+						/>
+					</View>
+				</View>
+
+				<View style={styles.inputRow}>
+					<View style={styles.inputGroup}>
+						<Text style={styles.labelText}>Annuel brut</Text>
+						<TextInput
+							style={styles.input}
+							value={annualGross}
+							onChangeText={(value) => handleInputChange("annualGross", value)}
+							onFocus={() => handleInputFocus("annualGross")}
+							onBlur={handleInputBlur}
+							keyboardType="numeric"
+							placeholder="ex : 17976"
+							placeholderTextColor="#e74c3c"
+						/>
+					</View>
+					<View style={styles.inputGroup}>
+						<Text style={styles.labelText}>Annuel net</Text>
+						<TextInput
+							style={styles.input}
+							value={annualNet}
+							onChangeText={(value) => handleInputChange("annualNet", value)}
+							onFocus={() => handleInputFocus("annualNet")}
+							onBlur={handleInputBlur}
+							keyboardType="numeric"
+							placeholder="Annuel"
+							placeholderTextColor="#e74c3c"
+						/>
+					</View>
+				</View>
+
+				<View style={styles.statusSection}>
+					<Text style={styles.sectionTitle}>Sélectionnez votre statut :</Text>
+					<View style={styles.statusOptions}>
+						{statusOptions.map((option) => (
+							<TouchableOpacity
+								key={option.value}
+								style={[
+									styles.statusOption,
+									status === option.value && styles.statusOptionSelected,
+								]}
+								onPress={() => {
+									setStatus(option.value);
+								}}
+							>
+								<View
+									style={[
+										styles.radio,
+										status === option.value && styles.radioSelected,
+									]}
+								>
+									{status === option.value && (
+										<View style={styles.radioInner} />
+									)}
+								</View>
+								<Text
+									style={[
+										styles.statusLabel,
+										status === option.value && styles.statusLabelSelected,
+									]}
+								>
+									{option.label}
+								</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				</View>
+
+				<View style={styles.sliderSection}>
+					<Text style={styles.sectionTitle}>
+						Sélectionnez votre temps de travail : {workTimePercentage}%
+					</Text>
+					<View style={styles.sliderContainer}>
+						<Slider
+							style={styles.slider}
+							minimumValue={10}
+							maximumValue={100}
+							value={workTimePercentage}
+							onValueChange={(value) => {
+								setWorkTimePercentage(value);
+							}}
+							step={10}
+							minimumTrackTintColor="#e74c3c"
+							maximumTrackTintColor="#e0e0e0"
+							thumbTintColor="#e74c3c"
+						/>
+					</View>
+				</View>
+
+				<View style={styles.bonusSection}>
+					<Text style={styles.sectionTitle}>
+						Sélectionnez le nombre de mois de prime conventionnelle:
+					</Text>
+					<View style={styles.bonusOptions}>
+						{bonusMonthOptions.map((months) => (
+							<TouchableOpacity
+								key={months}
+								style={[
+									styles.bonusOption,
+									bonusMonths === months && styles.bonusOptionSelected,
+								]}
+								onPress={() => {
+									setBonusMonths(months);
+								}}
+							>
+								<View
+									style={[
+										styles.radio,
+										bonusMonths === months && styles.radioSelected,
+									]}
+								>
+									{bonusMonths === months && <View style={styles.radioInner} />}
+								</View>
+								<Text
+									style={[
+										styles.bonusLabel,
+										bonusMonths === months && styles.bonusLabelSelected,
+									]}
+								>
+									{months} mois
+								</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				</View>
+
+				<View style={styles.deductionSection}>
+					<Text style={styles.sectionTitle}>
+						Sélectionnez le taux de prélèvement à la source:{" "}
+						{sourceDeduction.toFixed(1)}%
+					</Text>
+					<View style={styles.sliderContainer}>
+						<Slider
+							style={styles.slider}
+							minimumValue={0}
+							maximumValue={100}
+							value={sourceDeduction}
+							onValueChange={(value) => {
+								setSourceDeduction(value);
+							}}
+							step={0.5}
+							minimumTrackTintColor="#e74c3c"
+							maximumTrackTintColor="#e0e0e0"
+							thumbTintColor="#e74c3c"
+						/>
+					</View>
+				</View>
+
+				<View style={styles.resultSection}>
+					<Text style={styles.resultTitle}>
+						Estimation de votre salaire net après le prélèvement à la source
+					</Text>
+					<View style={styles.resultRow}>
+						<View style={styles.resultGroup}>
+							<Text style={styles.resultLabel}>Mensuel net après impôts</Text>
+							<TextInput
+								style={styles.resultInput}
+								value={monthlyNetAfterTax}
+								editable={false}
+							/>
+						</View>
+						<View style={styles.resultGroup}>
+							<Text style={styles.resultLabel}>Annuel net après impôts</Text>
+							<TextInput
+								style={styles.resultInput}
+								value={annualNetAfterTax}
+								editable={false}
+							/>
+						</View>
+					</View>
+				</View>
+
+				<TouchableOpacity style={styles.clearButton} onPress={clearFields}>
+					<Text style={styles.clearButtonText}>Effacer les champs</Text>
+				</TouchableOpacity>
 			</ScrollView>
 		</View>
 	);
