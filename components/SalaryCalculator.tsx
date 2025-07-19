@@ -1,5 +1,5 @@
 import Slider from "@react-native-community/slider";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
 	Platform,
 	ScrollView,
@@ -72,6 +72,9 @@ export default function SalaryCalculator() {
 	const [annualNetAfterTax, setAnnualNetAfterTax] = useState("0");
 	const [focusedInput, setFocusedInput] = useState<string | null>(null);
 	const [inputValues, setInputValues] = useState<Record<string, string>>({});
+	
+	// Track previous dependency values to avoid infinite loops
+	const prevDepsRef = useRef({ status, workTimePercentage, bonusMonths, sourceDeduction });
 	
 	// Internal exact values for precise calculations using BigNumber
 	const [exactValues, setExactValues] = useState({
@@ -198,6 +201,54 @@ export default function SalaryCalculator() {
 		],
 	);
 
+	// Recalculate when dependencies change (status, workTimePercentage, bonusMonths, sourceDeduction)
+	useEffect(() => {
+		const currentDeps = { status, workTimePercentage, bonusMonths, sourceDeduction };
+		const prevDeps = prevDepsRef.current;
+		
+		// Check if dependencies actually changed
+		const depsChanged = Object.keys(currentDeps).some((key) => 
+			currentDeps[key as keyof typeof currentDeps] !== prevDeps[key as keyof typeof prevDeps]
+		);
+		
+		if (depsChanged) {
+			// Update the ref with current values
+			prevDepsRef.current = currentDeps;
+			
+			// Only recalculate if we have some values to work with
+			if (!exactValues.hourlyGross.isZero() || !exactValues.monthlyGross.isZero() || !exactValues.annualGross.isZero() ||
+				!exactValues.hourlyNet.isZero() || !exactValues.monthlyNet.isZero() || !exactValues.annualNet.isZero()) {
+				
+				// Find the first non-zero value to use as source, prioritizing monthly gross
+				let source: string;
+				let value: string;
+				
+				if (!exactValues.monthlyGross.isZero()) {
+					source = "monthlyGross";
+					value = exactValues.monthlyGross.toString();
+				} else if (!exactValues.hourlyGross.isZero()) {
+					source = "hourlyGross";
+					value = exactValues.hourlyGross.toString();
+				} else if (!exactValues.annualGross.isZero()) {
+					source = "annualGross";
+					value = exactValues.annualGross.toString();
+				} else if (!exactValues.monthlyNet.isZero()) {
+					source = "monthlyNet";
+					value = exactValues.monthlyNet.toString();
+				} else if (!exactValues.hourlyNet.isZero()) {
+					source = "hourlyNet";
+					value = exactValues.hourlyNet.toString();
+				} else if (!exactValues.annualNet.isZero()) {
+					source = "annualNet";
+					value = exactValues.annualNet.toString();
+				} else {
+					return;
+				}
+				
+				updateAllFields(source as "hourlyGross" | "monthlyGross" | "annualGross" | "hourlyNet" | "monthlyNet" | "annualNet", value);
+			}
+		}
+	}, [status, workTimePercentage, bonusMonths, sourceDeduction, updateAllFields, exactValues]);
 
 	const statusOptions: Array<{ label: string; value: Status }> = [
 		{ label: "Salarié non-cadre", value: "non-cadre" },
