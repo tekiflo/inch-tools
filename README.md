@@ -1,6 +1,6 @@
 # Inch Tools
 
-A collection of practical web tools for common calculations and conversions.
+Collection of practical web tools for common calculations and conversions.
 
 ## 🛠️ Available Tools
 
